@@ -1,10 +1,12 @@
 name: Publish
 
-# Publishing a GitHub release publishes the WinUia packages to nuget.org, versioned from the release tag:
-# v1.2.0 or V1.2.0 -> 1.2.0, v1.3.0-beta.1 -> 1.3.0-beta.1.
+# Publishing a GitHub release publishes the WinUia packages to GitHub Packages and nuget.org, versioned from the
+# release tag: v1.2.0 or V1.2.0 -> 1.2.0, v1.3.0-beta.1 -> 1.3.0-beta.1.
 # Authenticates with NuGet trusted publishing: no long-lived API key is stored anywhere. nuget.org trusts this workflow
 # (owner buning-software, repository win-uia, workflow publish.yaml, environment nuget) and exchanges its GitHub OIDC
 # token for a short-lived API key. The nuget environment holds one secret, NUGET_USER: the nuget.org account name.
+# GitHub Packages is pushed to with the workflow's own GITHUB_TOKEN; it links each package to this repository through
+# its RepositoryUrl, so they show under the repository's Packages.
 on:
   release:
     types: [published]
@@ -25,6 +27,8 @@ jobs:
     environment: nuget
     permissions:
       contents: read
+      # Lets the GITHUB_TOKEN push to GitHub Packages.
+      packages: write
       # Lets NuGet/login request the GitHub OIDC token that nuget.org exchanges for a temporary API key.
       id-token: write
     steps:
@@ -61,6 +65,17 @@ jobs:
           name: packages
           path: packages
           if-no-files-found: error
+
+      # GitHub Packages has no symbol server, so only the .nupkg files go there.
+      - name: Push to GitHub Packages
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for package in packages/*.nupkg; do
+            dotnet nuget push "$package" --api-key "$GITHUB_TOKEN" --no-symbols \
+              --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
+          done
 
       # The temporary API key is valid for an hour, so log in right before the push.
       - name: Log in to nuget.org
