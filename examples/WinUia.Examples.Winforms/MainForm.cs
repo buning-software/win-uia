@@ -1,7 +1,7 @@
 namespace WinUia.Examples.Winforms;
 
 /// <summary>
-/// Main window of the WinForms example app, automated by examples/WinUia.Examples.Winforms.Tests. The controls are laid out in the designer; WinForms exposes each
+/// Main window of the WinForms example app, automated by examples/WinUia.Examples.Winforms.UiTests. The controls are laid out in the designer; WinForms exposes each
 /// control's <see cref="Control.Name"/> as its UI Automation AutomationId, so those names are the ids the tests
 /// search for. The window is TopMost because the physical-input tests click screen coordinates.
 /// </summary>

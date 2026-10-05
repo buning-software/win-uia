@@ -1,6 +1,6 @@
 using WinUia.Core;
 
-namespace WinUia.Examples.Winforms.Tests.Application;
+namespace WinUia.Examples.Winforms.UiTests.Application;
 
 /// <summary>The content of the second tab page, found under the main window.</summary>
 public sealed class Tab2(Element window)

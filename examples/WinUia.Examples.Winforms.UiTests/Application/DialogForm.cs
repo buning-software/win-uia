@@ -1,7 +1,6 @@
 using WinUia.Core;
 
-
-namespace WinUia.Examples.Winforms.Tests.Application;
+namespace WinUia.Examples.Winforms.UiTests.Application;
 
 public sealed class DialogForm(Element window)
 {

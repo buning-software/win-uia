@@ -22,7 +22,7 @@
     <Project Path="tests/WinUia.Testing.Shared/WinUia.Testing.Shared.csproj" />
   </Folder>
   <Folder Name="/examples/">
+    <Project Path="examples/WinUia.Examples.Winforms.UiTests/WinUia.Examples.Winforms.UiTests.csproj" />
     <Project Path="examples/WinUia.Examples.Winforms/WinUia.Examples.Winforms.csproj" />
-    <Project Path="examples/WinUia.Examples.Winforms.Tests/WinUia.Examples.Winforms.Tests.csproj" />
   </Folder>
 </Solution>

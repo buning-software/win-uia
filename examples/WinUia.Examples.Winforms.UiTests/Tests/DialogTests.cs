@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using WinUia.Core.Exceptions;
-using WinUia.Examples.Winforms.Tests.Application;
+using WinUia.Examples.Winforms.UiTests.Application;
 
-namespace WinUia.Examples.Winforms.Tests;
+namespace WinUia.Examples.Winforms.UiTests;
 
 [UiTest]
 public sealed class DialogTests

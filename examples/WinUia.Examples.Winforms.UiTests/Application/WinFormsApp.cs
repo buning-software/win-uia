@@ -1,7 +1,7 @@
 using System.Reflection;
 using WinUia.Core;
 
-namespace WinUia.Examples.Winforms.Tests.Application;
+namespace WinUia.Examples.Winforms.UiTests.Application;
 
 /// <summary>
 /// Page object for the example WinForms app: the <see cref="App"/> itself, with the controls of its main window.

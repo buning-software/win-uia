@@ -1,8 +1,8 @@
-using WinUia.Core.Exceptions;
 using WinUia.Core;
-using WinUia.Examples.Winforms.Tests.Application;
+using WinUia.Core.Exceptions;
+using WinUia.Examples.Winforms.UiTests.Application;
 
-namespace WinUia.Examples.Winforms.Tests;
+namespace WinUia.Examples.Winforms.UiTests;
 
 /// <summary>
 /// Elements re-find themselves when their control is re-created: FindFirst results through their search, FindAll

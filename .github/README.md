@@ -118,7 +118,7 @@ A page object for the whole application derives from `App` and lists its control
 which executable it is and how it starts by default, so tests launch it without repeating either. `AppLaunchOptions`
 sets the arguments, working directory, environment, pointer and main-window timeout; options passed to a factory
 override the page object's defaults one by one. Page objects for part of the UI are plain classes built on an
-`Element` (see `examples/WinUia.Examples.Winforms.Tests`):
+`Element` (see `examples/WinUia.Examples.Winforms.UiTests`):
 
 ```csharp
 public sealed class MainPage : App
@@ -167,10 +167,10 @@ Every test in a `.UiTests` project gets `[UiTest]` from the build (category `UI`
 `dotnet test --filter "Category!=UI"` runs the unit and integration tests on any Windows machine. UI tests launch
 `tests/WinUia.TestApp`, an empty window, located through `tests/WinUia.Testing.Shared` (`AppPaths`). Tests of control
 behaviour (patterns, searches, self-healing elements, dialogs, input) run against the WinForms example instead, in
-`examples/WinUia.Examples.Winforms.Tests`. Tests use NUnit.
+`examples/WinUia.Examples.Winforms.UiTests`. Tests use NUnit.
 
 `examples/` shows WinUia the way a user would use it: `WinUia.Examples.Winforms` is a WinForms app and
-`WinUia.Examples.Winforms.Tests` tests it with page objects, using only WinUia's public API and `WinUia.NUnit`, nothing
+`WinUia.Examples.Winforms.UiTests` tests it with page objects, using only WinUia's public API and `WinUia.NUnit`, nothing
 from `tests/`. Examples and tests are independent: neither references the other.
 
 ### Limitations
