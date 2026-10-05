@@ -69,11 +69,14 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
-      # Pushes every .nupkg; nuget.org picks up the .snupkg symbol package next to each one.
+      # Pushes every .nupkg; nuget.org picks up the .snupkg symbol package next to each one. Bash expands the glob:
+      # dotnet nuget push on Windows does not expand "packages/*.nupkg" itself and fails with "File does not exist".
       - name: Push to nuget.org
         shell: bash
-        run: >-
-          dotnet nuget push "packages/*.nupkg"
-          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
-          --source https://api.nuget.org/v3/index.json
-          --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          for package in packages/*.nupkg; do
+            dotnet nuget push "$package" --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done
