@@ -19,16 +19,10 @@
     <RepositoryUrl>https://github.com/buning-software/win-uia</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui-automation;uia;uia3;windows;automation;testing;ui-testing;winforms;wpf;winui</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- Symbols go to nuget.org's symbol server as .snupkg next to each package, so users can step into WinUia. -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!-- The repository README, shown on each package's nuget.org page. -->
-    <None Include="$(MSBuildThisFileDirectory)..\.github\README.md" Pack="true" PackagePath="\" Visible="false" />
-  </ItemGroup>
 
   <ItemGroup>
     <!-- Each module's own test projects, e.g. WinUia.Core -> WinUia.Core.UnitTests, .IntegrationTests and .UiTests. -->
