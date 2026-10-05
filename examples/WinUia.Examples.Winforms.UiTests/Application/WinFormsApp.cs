@@ -9,7 +9,7 @@ namespace WinUia.Examples.Winforms.UiTests.Application;
 /// <c>App.Launch&lt;WinFormsApp&gt;(new AppLaunchOptions { ShowPointer = false })</c> where nobody watches.
 /// The tab pages and the dialog are page objects of their own, built on the elements they cover.
 /// </summary>
-public sealed class WinFormsApp : App
+public class WinFormsApp : App
 {
     /// <inheritdoc />
     protected override string ExecutablePath => typeof(WinFormsApp).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()

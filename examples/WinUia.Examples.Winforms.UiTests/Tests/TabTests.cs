@@ -1,6 +1,6 @@
 using WinUia.Examples.Winforms.UiTests.Application;
 
-namespace WinUia.Examples.Winforms.UiTests;
+namespace WinUia.Examples.Winforms.UiTests.Tests;
 
 [UiTest]
 public sealed class TabTests
@@ -57,7 +57,7 @@ public sealed class TabTests
     public void The_main_form_controls_keep_working_while_another_tab_is_selected()
     {
         var tab2 = _app.SelectTab2();
-
+        tab2.SelectTab1();
         _app.Button.Click();
 
         using (Assert.EnterMultipleScope())

@@ -3,7 +3,7 @@ using WinUia.Core.Exceptions;
 using WinUia.Core.Patterns;
 using WinUia.Examples.Winforms.UiTests.Application;
 
-namespace WinUia.Examples.Winforms.UiTests;
+namespace WinUia.Examples.Winforms.UiTests.Tests;
 
 /// <summary>Control patterns, searches, tree navigation and physical input, exercised on the example app's controls.</summary>
 

@@ -2,7 +2,7 @@ using WinUia.Core;
 using WinUia.Core.Patterns;
 using WinUia.Examples.Winforms.UiTests.Application;
 
-namespace WinUia.Examples.Winforms.UiTests;
+namespace WinUia.Examples.Winforms.UiTests.Tests;
 
 [UiTest]
 public sealed class MainFormTests
