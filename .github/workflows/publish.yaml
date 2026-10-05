@@ -1,7 +1,10 @@
 name: Publish
 
 # Publishing a GitHub release publishes the WinUia packages to nuget.org, versioned from the release tag:
-# v1.2.0 -> 1.2.0, v1.3.0-beta.1 -> 1.3.0-beta.1.
+# v1.2.0 or V1.2.0 -> 1.2.0, v1.3.0-beta.1 -> 1.3.0-beta.1.
+# Authenticates with NuGet trusted publishing: no long-lived API key is stored anywhere. nuget.org trusts this workflow
+# (owner buning-software, repository win-uia, workflow publish.yaml, environment nuget) and exchanges its GitHub OIDC
+# token for a short-lived API key. The nuget environment holds one secret, NUGET_USER: the nuget.org account name.
 on:
   release:
     types: [published]
@@ -20,6 +23,10 @@ jobs:
     needs: test
     runs-on: windows-latest
     environment: nuget
+    permissions:
+      contents: read
+      # Lets NuGet/login request the GitHub OIDC token that nuget.org exchanges for a temporary API key.
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -35,7 +42,7 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
-          version="${TAG#v}"
+          version="${TAG#[vV]}"
           if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "::error::Release tag '$TAG' is not a version such as v1.2.0 or v1.3.0-beta.1."
             exit 1
@@ -55,11 +62,18 @@ jobs:
           path: packages
           if-no-files-found: error
 
+      # The temporary API key is valid for an hour, so log in right before the push.
+      - name: Log in to nuget.org
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       # Pushes every .nupkg; nuget.org picks up the .snupkg symbol package next to each one.
       - name: Push to nuget.org
         shell: bash
         run: >-
           dotnet nuget push "packages/*.nupkg"
-          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate

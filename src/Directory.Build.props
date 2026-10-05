@@ -15,8 +15,8 @@
     <Authors>Buning Software</Authors>
     <Company>Buning Software</Company>
     <Copyright>Copyright © Buning Software</Copyright>
-    <PackageProjectUrl>https://github.com/BuningSoftware/win-uia</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/BuningSoftware/win-uia</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/buning-software/win-uia</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/buning-software/win-uia</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui-automation;uia;uia3;windows;automation;testing;ui-testing;winforms;wpf;winui</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
