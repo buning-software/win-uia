@@ -1,13 +1,11 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
-/// <summary>The ScrollItem pattern: items inside a scrollable container.</summary>
-public sealed class ScrollItemPatternWrapper : PatternWrapper
+internal sealed class ScrollItemPatternWrapper : PatternWrapper
 {
     internal ScrollItemPatternWrapper(Element element)
         : base(element, PatternIds.ScrollItem, PropertyIds.IsScrollItemPatternAvailable, "ScrollItem") { }
 
-    /// <summary>Scrolls the container so the item is visible.</summary>
-    public void ScrollIntoView() => Call<IUIAutomationScrollItemPattern>(p => p.ScrollIntoView());
+    internal void ScrollIntoView() => Call<IUIAutomationScrollItemPattern>(p => p.ScrollIntoView());
 }

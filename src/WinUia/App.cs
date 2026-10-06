@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
-using WinUia.Core;
-using WinUia.Core.Exceptions;
-using WinUia.Launchers;
+using WinUia.Models;
 
 namespace WinUia;
 
@@ -12,9 +10,10 @@ namespace WinUia;
 /// using var app = App.Launch(@"C:\path\to\MyApp.exe");
 /// app.Find("btnOk").Click();
 /// </code>
-/// A page object for the whole application derives from <see cref="App"/> and lists its controls; the generic factories
-/// create it already connected: <c>App.Launch&lt;MainPage&gt;(path, options)</c>. Page objects for part of the UI are
-/// plain classes built on an <see cref="Element"/>, for example <c>new SettingsDialog(app.FindWindow("Settings"))</c>.
+/// An application can have its own class that derives from <see cref="App"/> and says which executable it is and how it
+/// starts by default; the generic factories create it already connected: <c>App.Launch&lt;MyApp&gt;()</c>. What is on
+/// screen is described by page objects: plain classes built on the app or an <see cref="Element"/>, for example
+/// <c>new SettingsDialog(app.FindWindow("Settings"))</c>.
 /// <para>
 /// Must be used from an MTA thread (see <see cref="AutomationContext"/>); creating it on an STA thread throws.
 /// Disposing an app that was launched closes it; disposing an attached app leaves it running.
@@ -28,14 +27,14 @@ public class App : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// For derived types (page objects), which are created by the generic factories such as
-    /// <see cref="Launch{TApp}(AppLaunchOptions?)"/>; those connect the instance to the application. The constructor
+    /// For derived types, which are created by the generic factories such as
+    /// <see cref="Launch{TApp}()"/>; those connect the instance to the application. The constructor
     /// runs before the application starts, so it cannot use <see cref="MainWindow"/> or <see cref="Process"/>.
     /// </summary>
     protected App() { }
 
     /// <summary>
-    /// The executable a page object launches when <see cref="Launch{TApp}(AppLaunchOptions?)"/> is called without a
+    /// The executable a page object launches when <see cref="Launch{TApp}()"/> is called without a
     /// path. Null (the default) means the page object does not know its executable, so a path must be passed.
     /// </summary>
     protected virtual string? ExecutablePath => null;
@@ -63,10 +62,14 @@ public class App : IDisposable
     /// <c>App.Launch&lt;MainPage&gt;()</c>. Throws <see cref="InvalidOperationException"/>, before anything starts,
     /// when <typeparamref name="TApp"/> does not declare one, and <see cref="AppProcessException"/> when it cannot be started.
     /// </summary>
-    public static TApp Launch<TApp>(AppLaunchOptions? options = null) where TApp : App, new()
+    public static TApp Launch<TApp>() where TApp : App, new() =>
+        Launch<TApp>(options: null);
+
+    /// <summary>Like <see cref="Launch{TApp}()"/>, with <paramref name="options"/> overriding the page object's <c>DefaultOptions</c> one by one.</summary>
+    public static TApp Launch<TApp>(AppLaunchOptions? options) where TApp : App, new()
     {
         var app = new TApp();
-        App definition = app; // Protected members are reachable through the base type here.
+        App definition = app; // Protected members are reachable only through the base type.
         var path = definition.ExecutablePath ?? throw new InvalidOperationException(
             $"{typeof(TApp).Name} does not say which executable it launches. Override {nameof(ExecutablePath)} in " +
             $"{typeof(TApp).Name}, or pass the path: App.Launch<{typeof(TApp).Name}>(path).");
@@ -80,11 +83,7 @@ public class App : IDisposable
     /// <see cref="AppLaunchOptions.Environment"/>, which Windows decides for packaged apps.
     /// </summary>
     public static App LaunchPackaged(string appUserModelId, AppLaunchOptions? options = null) =>
-        Start(new App(), effective => AppLauncher.LaunchPackaged(appUserModelId, effective), options, packaged: true);
-
-    /// <summary>Like <see cref="LaunchPackaged(string, AppLaunchOptions?)"/>, as <typeparamref name="TApp"/>.</summary>
-    public static TApp LaunchPackaged<TApp>(string appUserModelId, AppLaunchOptions? options = null) where TApp : App, new() =>
-        Start(new TApp(), effective => AppLauncher.LaunchPackaged(appUserModelId, effective), options, packaged: true);
+        Start(new App(), effective => AppLauncher.LaunchPackaged(appUserModelId, effective), options);
 
     /// <summary>Attaches to a running process by id. Throws <see cref="AppProcessException"/> when it is not running.</summary>
     public static App Attach(int processId) =>
@@ -93,14 +92,6 @@ public class App : IDisposable
     /// <summary>Like <see cref="Attach(int)"/>, as <typeparamref name="TApp"/>.</summary>
     public static TApp Attach<TApp>(int processId) where TApp : App, new() =>
         Start(new TApp(), _ => AppLauncher.Attach(processId), options: null, ownsProcess: false);
-
-    /// <summary>Attaches to a running process by name (without ".exe"). Throws <see cref="AppProcessException"/> when none is running.</summary>
-    public static App Attach(string processName) =>
-        Start(new App(), _ => AppLauncher.Attach(processName), options: null, ownsProcess: false);
-
-    /// <summary>Like <see cref="Attach(string)"/>, as <typeparamref name="TApp"/>.</summary>
-    public static TApp Attach<TApp>(string processName) where TApp : App, new() =>
-        Start(new TApp(), _ => AppLauncher.Attach(processName), options: null, ownsProcess: false);
 
     /// <summary>The automation context used for this app.</summary>
     public AutomationContext Context => _context ?? throw NotConnected();
@@ -112,7 +103,7 @@ public class App : IDisposable
     public TimeSpan MainWindowTimeout { get; set; } = TimeSpan.FromSeconds(20);
 
     /// <summary>The application's main window, waited for on first use.</summary>
-    public Element MainWindow => field ??= AppLauncher.GetMainWindow(Context, Process, MainWindowTimeout);
+    public Element MainWindow => field ??= MainWindowLocator.Find(Context, Process, MainWindowTimeout);
 
     /// <summary>
     /// Waits for a descendant of the main window whose AutomationId, or failing that Name, equals
@@ -131,29 +122,25 @@ public class App : IDisposable
     /// listed under their owner or under the desktop depending on the UI framework, so both are searched.
     /// Throws <see cref="UiaElementNotFoundException"/> on timeout.
     /// </summary>
-    public Element FindWindow(string title, TimeSpan? timeout = null)
-    {
-        var effectiveTimeout = timeout ?? Context.DefaultTimeout;
-        return TryFindWindow(title, effectiveTimeout)
-            ?? throw new UiaElementNotFoundException(
-                $"No window titled '{title}' of process {Process.Id} appeared within {effectiveTimeout.TotalMilliseconds:0} ms.");
-    }
+    public Element FindWindow(string title, TimeSpan? timeout = null) =>
+        Context.WaitForOrThrow(WindowProbe(title), () => $"window titled '{title}' of process {Process.Id}", timeout);
 
     /// <summary>Like <see cref="FindWindow"/>, but returns null on timeout.</summary>
-    public Element? TryFindWindow(string title, TimeSpan? timeout = null)
+    public Element? TryFindWindow(string title, TimeSpan? timeout = null) =>
+        Context.WaitFor(WindowProbe(title), timeout);
+
+    private Func<Element?> WindowProbe(string title)
     {
         var processId = Process.Id;
         Expression<Func<Element, bool>> isWindow = e => e.Name == title && e.ControlType == ControlType.Window && e.ProcessId == processId;
         var owner = MainWindow;
         var desktop = Context.GetRootElement();
-        return Context.WaitFor(
-            () => owner.TryFind(isWindow, TreeScope.Children, TimeSpan.Zero)
-                  ?? desktop.TryFind(isWindow, TreeScope.Children, TimeSpan.Zero),
-            timeout);
+        return () => owner.TryFind(isWindow, TreeScope.Children, TimeSpan.Zero)
+                     ?? desktop.TryFind(isWindow, TreeScope.Children, TimeSpan.Zero);
     }
 
     /// <summary>Closes the application: Window pattern first, then kill after <paramref name="timeout"/>.</summary>
-    public void Close(TimeSpan? timeout = null) => AppLauncher.Close(Context, Process, timeout);
+    public void Close(TimeSpan? timeout = null) => AppCloser.Close(Context, Process, timeout);
 
     /// <summary>Closes the app if it was launched by this instance, then releases the process and context.</summary>
     public void Dispose()
@@ -170,7 +157,7 @@ public class App : IDisposable
             return;
         _disposed = true;
 
-        // Created directly instead of through a factory: not connected, nothing to release.
+        // Not created through a factory: not connected, nothing to release.
         if (_process is null || _context is null)
             return;
 
@@ -186,19 +173,12 @@ public class App : IDisposable
         }
     }
 
-    /// <summary>
-    /// Connects <paramref name="app"/>, already constructed, to the application <paramref name="connect"/> starts or
-    /// attaches to, with <paramref name="options"/> over the page object's <see cref="DefaultOptions"/>. The context is
-    /// created before the process, so that an STA thread or invalid options fail before anything is started that would
-    /// have to be killed again.
-    /// </summary>
+    // The context is created before the process so an STA thread fails before anything is started.
     private static TApp Start<TApp>(TApp app, Func<AppLaunchOptions, Process> connect, AppLaunchOptions? options,
-        bool ownsProcess = true, bool packaged = false) where TApp : App
+        bool ownsProcess = true) where TApp : App
     {
-        App connected = app; // Private and protected members are reachable through the base type only.
+        App connected = app; // Private and protected members are reachable only through the base type.
         var effective = connected.DefaultOptions.OverriddenBy(options);
-        if (packaged)
-            AppLauncher.EnsurePackagedOptions(effective);
 
         var context = new AutomationContext();
         try
@@ -221,5 +201,5 @@ public class App : IDisposable
     }
 
     private static InvalidOperationException NotConnected() =>
-        new("This app is not connected to an application. Create it with App.Launch<TApp>(...), App.LaunchPackaged<TApp>(...) or App.Attach<TApp>(...).");
+        new("This app is not connected to an application. Create it with App.Launch<TApp>(...) or App.Attach<TApp>(...).");
 }

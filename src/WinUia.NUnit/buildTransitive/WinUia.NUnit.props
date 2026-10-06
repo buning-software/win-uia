@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup Condition="'$(WinUiaImplicitUsings)' != 'false'">
+    <Using Include="WinUia.NUnit" />
+    <Using Include="WinUia.NUnit.UiAssertions" Static="true" />
+  </ItemGroup>
+</Project>

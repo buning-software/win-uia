@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 
-// Declared in UIAutomationClient.h vtable order; see IUIAutomation.cs for the interop rules.
 namespace WinUia.Core.Interop;
 
 [ComImport, Guid("a543cc6a-f4ae-494b-8239-c814481187a8"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

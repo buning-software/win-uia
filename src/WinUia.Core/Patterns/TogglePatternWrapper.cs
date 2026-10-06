@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The Toggle pattern: controls that cycle through states, such as check boxes.</summary>
 public sealed class TogglePatternWrapper : PatternWrapper

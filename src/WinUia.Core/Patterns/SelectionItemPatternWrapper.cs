@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The SelectionItem pattern: selectable items, such as list items and radio buttons.</summary>
 public sealed class SelectionItemPatternWrapper : PatternWrapper

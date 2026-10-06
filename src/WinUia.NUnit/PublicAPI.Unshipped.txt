@@ -1,0 +1,12 @@
+#nullable enable
+const WinUia.NUnit.UiTestAttribute.Category = "UI" -> string!
+static WinUia.NUnit.UiAssertions.Eventually(System.Func<bool>! condition, string! because = "", System.TimeSpan? timeout = null) -> void
+WinUia.NUnit.UiAssertions
+WinUia.NUnit.UiTestAttribute
+WinUia.NUnit.UiTestAttribute.AfterTest(NUnit.Framework.Interfaces.ITest! test) -> void
+WinUia.NUnit.UiTestAttribute.ApplyToTest(NUnit.Framework.Internal.Test! test) -> void
+WinUia.NUnit.UiTestAttribute.BeforeTest(NUnit.Framework.Interfaces.ITest! test) -> void
+WinUia.NUnit.UiTestAttribute.Targets.get -> NUnit.Framework.ActionTargets
+WinUia.NUnit.UiTestAttribute.TimeoutSeconds.get -> int
+WinUia.NUnit.UiTestAttribute.TimeoutSeconds.set -> void
+WinUia.NUnit.UiTestAttribute.UiTestAttribute() -> void

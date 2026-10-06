@@ -1,5 +1,3 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- WinUia.NUnit, the module under test, is referenced by every test project (tests/Directory.Build.props). -->
-
 </Project>

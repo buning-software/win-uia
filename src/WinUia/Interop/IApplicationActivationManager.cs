@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 
 namespace WinUia.Interop;
 
-/// <summary>IApplicationActivationManager (shobjidl_core.h); only its first method is declared.</summary>
 [ComImport, Guid("2e941141-7f97-4756-ba1d-9decde894a3d"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 internal interface IApplicationActivationManager
 {

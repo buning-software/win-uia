@@ -2,7 +2,6 @@ namespace WinUia.TestApp;
 
 internal static class Program
 {
-    /// <summary>Shows <see cref="EmptyForm"/>. With <c>--ignore-close</c> the window refuses to close, so it has to be killed.</summary>
     [STAThread]
     private static void Main(string[] args)
     {

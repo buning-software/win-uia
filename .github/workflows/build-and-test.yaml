@@ -5,13 +5,10 @@ on:
   workflow_dispatch:
   workflow_call: {}
 
-# One run per pull request: a new commit cancels the run still in progress for the previous one.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-# WinUia is Windows-only (UI Automation COM, SendInput), so every job runs on Windows.
-# build compiles once; unit-test and ui-test run in parallel on its output.
 jobs:
   build:
     name: Build
@@ -20,21 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: '10.0.x'
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Load nuget cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/Directory.Build.props') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Check for unused usings
+        run: dotnet format style WinUia.slnx --diagnostics IDE0005 --severity info --verify-no-changes
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
@@ -59,22 +46,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Load nuget cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/Directory.Build.props') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      # dotnet test needs the restored project assets to find the test projects; the binaries come from build.
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Download build output
         uses: actions/download-artifact@v8
@@ -86,8 +59,6 @@ jobs:
 
   ui-test:
     name: Run UI tests
-    # UI tests ([UiTest], category UI) launch apps and drive them through UI Automation and SendInput, so they need an
-    # interactive desktop session, which GitHub-hosted Windows runners have.
     needs: build
     runs-on: windows-latest
     timeout-minutes: 20
@@ -95,22 +66,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Load nuget cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/Directory.Build.props') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      # dotnet test needs the restored project assets to find the test projects; the binaries come from build.
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Download build output
         uses: actions/download-artifact@v8

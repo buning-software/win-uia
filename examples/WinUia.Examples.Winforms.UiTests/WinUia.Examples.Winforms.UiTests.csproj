@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!--
-    UI tests of the example application (examples/WinUia.Examples.Winforms), written the way a WinUia user would:
-    page objects over WinUia, one desktop per test with [UiTest].
-  -->
+  <PropertyGroup>
+    <!-- LibraryImport-generated code needs unsafe blocks. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" />
@@ -17,12 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
     <ProjectReference Include="..\..\src\WinUia.NUnit\WinUia.NUnit.csproj" />
-    <Using Include="WinUia.NUnit" />
-    <Using Include="WinUia.NUnit.UiAssertions" Static="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The application under test: built alongside the tests and launched by them; not referenced as an assembly. -->
     <ProjectReference Include="..\WinUia.Examples.Winforms\WinUia.Examples.Winforms.csproj" ReferenceOutputAssembly="false" />
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
       <_Parameter1>ApplicationPath</_Parameter1>
@@ -31,11 +28,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- UI Automation must run on MTA threads. -->
+    <AssemblyAttribute Include="WinUia.NUnit.UiTestAttribute" />
+
+    <!-- UI Automation requires MTA. -->
     <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
       <_Parameter1>System.Threading.ApartmentState.MTA</_Parameter1>
       <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <!-- Package users get this from WinUia.NUnit's buildTransitive; a project reference does not import it. -->
+  <Import Project="..\..\src\WinUia.NUnit\buildTransitive\WinUia.NUnit.props" />
 
 </Project>

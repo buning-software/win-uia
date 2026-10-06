@@ -1,13 +1,7 @@
 using System.Runtime.InteropServices;
 
-// Hand-written COM interop for the UI Automation client API (UIAutomationClient.h, Windows SDK).
-//
-// The vtable order is the contract: every interface declares its methods in exactly the order of the
-// C vtable in UIAutomationClient.h (IUnknown's three slots are implied by InterfaceIsIUnknown). Methods
-// WinUia does not use are declared as "Reserved_<RealName>" stubs so the following slots stay aligned;
-// they must never be called. Slots after the last method used are simply not declared.
-//
-// UIA uses Win32 BOOL (4 bytes), not VARIANT_BOOL, so every bool is marshalled as UnmanagedType.Bool.
+// Hand-written COM interop (UIAutomationClient.h). Methods must be declared in exact vtable order; unused ones are "Reserved_*" stubs that keep slots aligned and must never be called.
+// UIA uses Win32 BOOL (4 bytes), not VARIANT_BOOL, so bools are marshalled as UnmanagedType.Bool.
 namespace WinUia.Core.Interop;
 
 [ComImport, Guid("30cbe57d-d9d0-452a-ab13-7ac5ac4825ee"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

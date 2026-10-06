@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <!-- The module under test. -->
-    <ProjectReference Include="..\..\src\WinUia.Input\WinUia.Input.csproj" />
-  </ItemGroup>
-
-</Project>

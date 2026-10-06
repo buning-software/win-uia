@@ -1,10 +1,5 @@
 namespace WinUia.Examples.Winforms;
 
-/// <summary>
-/// Main window of the WinForms example app, automated by examples/WinUia.Examples.Winforms.UiTests. The controls are laid out in the designer; WinForms exposes each
-/// control's <see cref="Control.Name"/> as its UI Automation AutomationId, so those names are the ids the tests
-/// search for. The window is TopMost because the physical-input tests click screen coordinates.
-/// </summary>
 public partial class MainForm : Form
 {
     private int _generation = 1;
@@ -17,7 +12,6 @@ public partial class MainForm : Form
     // ReSharper disable once LocalizableElement (the tests read this text)
     private void btnClick_Click(object? sender, EventArgs e) => lblResult.Text = "Clicked";
 
-    /// <summary>Opens the modal DialogForm and reports how it was closed in lblResult.</summary>
     private void btnOpenDialog_Click(object? sender, EventArgs e)
     {
         using var dialog = new DialogForm();
@@ -25,10 +19,6 @@ public partial class MainForm : Form
         lblResult.Text = result == DialogResult.OK ? $"Dialog: OK ({dialog.InputText})" : $"Dialog: {result}";
     }
 
-    /// <summary>
-    /// Destroys btnVolatile and creates a new one with the same AutomationId, which makes elements found earlier
-    /// stale (their window handle is gone) — the WinUI 3 re-render case.
-    /// </summary>
     private void btnRecreate_Click(object? sender, EventArgs e)
     {
         var old = btnVolatile;
@@ -38,10 +28,7 @@ public partial class MainForm : Form
         Controls.Add(btnVolatile);
     }
 
-    /// <summary>
-    /// Recreates the buttons in pnlItems in reverse order: every button gets a new window handle and most change
-    /// position, so index-based re-resolution would pick the wrong one.
-    /// </summary>
+    // Reversed with new window handles, so index-based re-resolution would pick the wrong button.
     private void btnReverse_Click(object? sender, EventArgs e)
     {
         var old = pnlItems.Controls.Cast<Button>().ToArray();

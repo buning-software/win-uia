@@ -1,13 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A dependency-free .NET wrapper around the Windows UI Automation (UIA3) COM API.</Description>
+    <Description>A dependency-free .NET wrapper around the Windows UI Automation (UIA3) COM API, with physical mouse and keyboard input.</Description>
   </PropertyGroup>
-
-  <!-- WinUia (the entry module) uses Core through its public API only; do not add InternalsVisibleTo for it. -->
-  <ItemGroup>
-    <!-- Core uses Input's public API only (IInputSimulator, Win32InputSimulator, PhysicalDpi), like any other consumer. -->
-    <ProjectReference Include="..\WinUia.Input\WinUia.Input.csproj" />
-  </ItemGroup>
 
 </Project>

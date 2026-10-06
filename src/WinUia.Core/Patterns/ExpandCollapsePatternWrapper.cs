@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The ExpandCollapse pattern: combo boxes, menus, tree items.</summary>
 public sealed class ExpandCollapsePatternWrapper : PatternWrapper
