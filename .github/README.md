@@ -178,7 +178,7 @@ Module rules:
 * Each module's `Interop/` folder is private to that module. Other modules use what it offers (`IInputSimulator`), never its P/Invoke or COM declarations.
 * Modules use each other's public API only, the same API an application built on WinUia gets.
 * Internals are shared only through `InternalsVisibleTo`, and only with the module's own test projects.
-* Folders group files by role (for example models, enumerations, exceptions, patterns, interop); a folder exists only when it has files, and test projects mirror the folders of what they test. Namespaces do not follow folders: public and internal types alike use `WinUia`, `WinUia.Patterns`, `WinUia.Input` and `WinUia.NUnit` (visibility is the `internal` keyword's job), except `Interop/`, which keeps its project's `.Interop` namespace as a fence; tests follow project and folder. One type per file.
+* Folders group files by role (for example models, enumerations, exceptions, patterns, interop); a folder exists only when it has files, and test projects mirror the folders of what they test. Namespaces do not follow folders: public and internal types alike use `WinUia`, `WinUia.Patterns`, `WinUia.Input` and `WinUia.NUnit` (visibility is the `internal` keyword's job), except `Interop/`, which keeps its project's `.Interop` namespace as a fence, and `AppLaunchOptions`, which lives in `WinUia.Models`; tests follow project and folder. One type per file.
 * Package versions are set once, in `Directory.Packages.props`.
 * Every public member is listed in the package's `PublicAPI.Unshipped.txt` (moved to `PublicAPI.Shipped.txt` at release); the build fails on an unlisted change, so a public API change always shows in review.
 
