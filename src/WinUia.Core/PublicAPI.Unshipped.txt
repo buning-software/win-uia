@@ -1,0 +1,252 @@
+#nullable enable
+override WinUia.Element.ToString() -> string!
+override WinUia.ScreenPoint.GetHashCode() -> int
+override WinUia.ScreenRect.GetHashCode() -> int
+static WinUia.ElementExtensions.Ancestors(this WinUia.Element! element) -> System.Collections.Generic.IEnumerable<WinUia.Element!>!
+static WinUia.Poll.DefaultTimeout.get -> System.TimeSpan
+static WinUia.Poll.Until(System.Func<bool>! condition, System.TimeSpan? timeout = null) -> bool
+static WinUia.ScreenPoint.operator !=(WinUia.ScreenPoint left, WinUia.ScreenPoint right) -> bool
+static WinUia.ScreenPoint.operator ==(WinUia.ScreenPoint left, WinUia.ScreenPoint right) -> bool
+static WinUia.ScreenRect.operator !=(WinUia.ScreenRect left, WinUia.ScreenRect right) -> bool
+static WinUia.ScreenRect.operator ==(WinUia.ScreenRect left, WinUia.ScreenRect right) -> bool
+WinUia.AutomationContext
+WinUia.AutomationContext.AutomationContext() -> void
+WinUia.AutomationContext.DefaultTimeout.get -> System.TimeSpan
+WinUia.AutomationContext.DefaultTimeout.set -> void
+WinUia.AutomationContext.Dispose() -> void
+WinUia.AutomationContext.FromHandle(nint hwnd) -> WinUia.Element!
+WinUia.AutomationContext.FromPoint(WinUia.ScreenPoint point) -> WinUia.Element!
+WinUia.AutomationContext.GetFocusedElement() -> WinUia.Element!
+WinUia.AutomationContext.GetRootElement() -> WinUia.Element!
+WinUia.AutomationContext.Input.get -> WinUia.Input.IInputSimulator!
+WinUia.AutomationContext.Input.set -> void
+WinUia.AutomationContext.ShowPointer.get -> bool
+WinUia.AutomationContext.ShowPointer.set -> void
+WinUia.AutomationContext.StaleRetryCount.get -> int
+WinUia.AutomationContext.StaleRetryCount.set -> void
+WinUia.AutomationContext.WaitFor<T>(System.Func<T?>! probe, System.TimeSpan? timeout = null) -> T?
+WinUia.AutomationContext.WaitForOrThrow<T>(System.Func<T?>! probe, System.Func<string!>! what, System.TimeSpan? timeout = null) -> T!
+WinUia.ControlType
+WinUia.ControlType.AppBar = 50040 -> WinUia.ControlType
+WinUia.ControlType.Button = 50000 -> WinUia.ControlType
+WinUia.ControlType.Calendar = 50001 -> WinUia.ControlType
+WinUia.ControlType.CheckBox = 50002 -> WinUia.ControlType
+WinUia.ControlType.ComboBox = 50003 -> WinUia.ControlType
+WinUia.ControlType.Custom = 50025 -> WinUia.ControlType
+WinUia.ControlType.DataGrid = 50028 -> WinUia.ControlType
+WinUia.ControlType.DataItem = 50029 -> WinUia.ControlType
+WinUia.ControlType.Document = 50030 -> WinUia.ControlType
+WinUia.ControlType.Edit = 50004 -> WinUia.ControlType
+WinUia.ControlType.Group = 50026 -> WinUia.ControlType
+WinUia.ControlType.Header = 50034 -> WinUia.ControlType
+WinUia.ControlType.HeaderItem = 50035 -> WinUia.ControlType
+WinUia.ControlType.Hyperlink = 50005 -> WinUia.ControlType
+WinUia.ControlType.Image = 50006 -> WinUia.ControlType
+WinUia.ControlType.List = 50008 -> WinUia.ControlType
+WinUia.ControlType.ListItem = 50007 -> WinUia.ControlType
+WinUia.ControlType.Menu = 50009 -> WinUia.ControlType
+WinUia.ControlType.MenuBar = 50010 -> WinUia.ControlType
+WinUia.ControlType.MenuItem = 50011 -> WinUia.ControlType
+WinUia.ControlType.Pane = 50033 -> WinUia.ControlType
+WinUia.ControlType.ProgressBar = 50012 -> WinUia.ControlType
+WinUia.ControlType.RadioButton = 50013 -> WinUia.ControlType
+WinUia.ControlType.ScrollBar = 50014 -> WinUia.ControlType
+WinUia.ControlType.SemanticZoom = 50039 -> WinUia.ControlType
+WinUia.ControlType.Separator = 50038 -> WinUia.ControlType
+WinUia.ControlType.Slider = 50015 -> WinUia.ControlType
+WinUia.ControlType.Spinner = 50016 -> WinUia.ControlType
+WinUia.ControlType.SplitButton = 50031 -> WinUia.ControlType
+WinUia.ControlType.StatusBar = 50017 -> WinUia.ControlType
+WinUia.ControlType.Tab = 50018 -> WinUia.ControlType
+WinUia.ControlType.TabItem = 50019 -> WinUia.ControlType
+WinUia.ControlType.Table = 50036 -> WinUia.ControlType
+WinUia.ControlType.Text = 50020 -> WinUia.ControlType
+WinUia.ControlType.Thumb = 50027 -> WinUia.ControlType
+WinUia.ControlType.TitleBar = 50037 -> WinUia.ControlType
+WinUia.ControlType.ToolBar = 50021 -> WinUia.ControlType
+WinUia.ControlType.ToolTip = 50022 -> WinUia.ControlType
+WinUia.ControlType.Tree = 50023 -> WinUia.ControlType
+WinUia.ControlType.TreeItem = 50024 -> WinUia.ControlType
+WinUia.ControlType.Unknown = 0 -> WinUia.ControlType
+WinUia.ControlType.Window = 50032 -> WinUia.ControlType
+WinUia.Element
+WinUia.Element.AutomationId.get -> string!
+WinUia.Element.BoundingRectangle.get -> WinUia.ScreenRect
+WinUia.Element.Children.get -> System.Collections.Generic.IReadOnlyList<WinUia.Element!>!
+WinUia.Element.ClassName.get -> string!
+WinUia.Element.Click() -> void
+WinUia.Element.Collapse() -> void
+WinUia.Element.Context.get -> WinUia.AutomationContext!
+WinUia.Element.ControlType.get -> WinUia.ControlType
+WinUia.Element.Expand() -> void
+WinUia.Element.ExpandCollapsePattern.get -> WinUia.Patterns.ExpandCollapsePatternWrapper!
+WinUia.Element.Find(System.Linq.Expressions.Expression<System.Func<WinUia.Element!, bool>!>! predicate, WinUia.TreeScope scope = WinUia.TreeScope.Descendants, System.TimeSpan? timeout = null) -> WinUia.Element!
+WinUia.Element.FindAll(System.Linq.Expressions.Expression<System.Func<WinUia.Element!, bool>!>! predicate, WinUia.TreeScope scope = WinUia.TreeScope.Descendants) -> System.Collections.Generic.IReadOnlyList<WinUia.Element!>!
+WinUia.Element.FindByAutomationId(string! automationId, System.TimeSpan? timeout = null) -> WinUia.Element!
+WinUia.Element.FindByAutomationIdOrName(string! automationIdOrName, System.TimeSpan? timeout = null) -> WinUia.Element!
+WinUia.Element.Focus() -> void
+WinUia.Element.FrameworkId.get -> string!
+WinUia.Element.GetClickablePoint() -> WinUia.ScreenPoint
+WinUia.Element.GetText() -> string!
+WinUia.Element.HasKeyboardFocus.get -> bool
+WinUia.Element.InvokePattern.get -> WinUia.Patterns.InvokePatternWrapper!
+WinUia.Element.IsEnabled.get -> bool
+WinUia.Element.IsOffscreen.get -> bool
+WinUia.Element.IsSameAs(WinUia.Element! other) -> bool
+WinUia.Element.Name.get -> string!
+WinUia.Element.NativeWindowHandle.get -> nint
+WinUia.Element.Parent.get -> WinUia.Element?
+WinUia.Element.PhysicalClick(WinUia.Input.MouseButton button = WinUia.Input.MouseButton.Left) -> void
+WinUia.Element.ProcessId.get -> int
+WinUia.Element.Refresh() -> bool
+WinUia.Element.RuntimeId.get -> System.Collections.Generic.IReadOnlyList<int>!
+WinUia.Element.Select() -> void
+WinUia.Element.SelectionItemPattern.get -> WinUia.Patterns.SelectionItemPatternWrapper!
+WinUia.Element.SetValue(string! value) -> void
+WinUia.Element.Toggle() -> void
+WinUia.Element.TogglePattern.get -> WinUia.Patterns.TogglePatternWrapper!
+WinUia.Element.TryFind(System.Linq.Expressions.Expression<System.Func<WinUia.Element!, bool>!>! predicate, WinUia.TreeScope scope = WinUia.TreeScope.Descendants, System.TimeSpan? timeout = null) -> WinUia.Element?
+WinUia.Element.TryFindByAutomationId(string! automationId, System.TimeSpan? timeout = null) -> WinUia.Element?
+WinUia.Element.TryFindByAutomationIdOrName(string! automationIdOrName, System.TimeSpan? timeout = null) -> WinUia.Element?
+WinUia.Element.ValuePattern.get -> WinUia.Patterns.ValuePatternWrapper!
+WinUia.Element.WindowPattern.get -> WinUia.Patterns.WindowPatternWrapper!
+WinUia.ElementExtensions
+WinUia.Input.IInputSimulator
+WinUia.Input.IInputSimulator.ClickAt(int x, int y, WinUia.Input.MouseButton button = WinUia.Input.MouseButton.Left) -> void
+WinUia.Input.IInputSimulator.GetCursorPosition() -> (int X, int Y)
+WinUia.Input.IInputSimulator.MoveTo(int x, int y) -> void
+WinUia.Input.IInputSimulator.MoveTo(int x, int y, System.TimeSpan duration) -> void
+WinUia.Input.IInputSimulator.SendKeys(params WinUia.Input.VirtualKey[]! keys) -> void
+WinUia.Input.IInputSimulator.SendText(string! text) -> void
+WinUia.Input.MouseButton
+WinUia.Input.MouseButton.Left = 0 -> WinUia.Input.MouseButton
+WinUia.Input.MouseButton.Right = 1 -> WinUia.Input.MouseButton
+WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.A = 65 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Alt = 18 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Back = 8 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.C = 67 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Control = 17 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Delete = 46 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Down = 40 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.End = 35 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Enter = 13 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Escape = 27 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.F4 = 115 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Home = 36 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Left = 37 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.PageDown = 34 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.PageUp = 33 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Right = 39 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Shift = 16 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Space = 32 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Tab = 9 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Up = 38 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.V = 86 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.X = 88 -> WinUia.Input.VirtualKey
+WinUia.Input.VirtualKey.Z = 90 -> WinUia.Input.VirtualKey
+WinUia.Input.Win32InputSimulator
+WinUia.Input.Win32InputSimulator.ClickAt(int x, int y, WinUia.Input.MouseButton button = WinUia.Input.MouseButton.Left) -> void
+WinUia.Input.Win32InputSimulator.GetCursorPosition() -> (int X, int Y)
+WinUia.Input.Win32InputSimulator.MoveArrivalTimeout.get -> System.TimeSpan
+WinUia.Input.Win32InputSimulator.MoveArrivalTimeout.init -> void
+WinUia.Input.Win32InputSimulator.MoveAttempts.get -> int
+WinUia.Input.Win32InputSimulator.MoveAttempts.init -> void
+WinUia.Input.Win32InputSimulator.MoveStepInterval.get -> System.TimeSpan
+WinUia.Input.Win32InputSimulator.MoveStepInterval.init -> void
+WinUia.Input.Win32InputSimulator.MoveTo(int x, int y) -> void
+WinUia.Input.Win32InputSimulator.MoveTo(int x, int y, System.TimeSpan duration) -> void
+WinUia.Input.Win32InputSimulator.SendKeys(params WinUia.Input.VirtualKey[]! keys) -> void
+WinUia.Input.Win32InputSimulator.SendText(string! text) -> void
+WinUia.Input.Win32InputSimulator.Win32InputSimulator() -> void
+WinUia.Patterns.ExpandCollapsePatternWrapper
+WinUia.Patterns.ExpandCollapsePatternWrapper.Collapse() -> void
+WinUia.Patterns.ExpandCollapsePatternWrapper.Expand() -> void
+WinUia.Patterns.ExpandCollapsePatternWrapper.State.get -> WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.ExpandCollapseState.Collapsed = 0 -> WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.ExpandCollapseState.Expanded = 1 -> WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.ExpandCollapseState.LeafNode = 3 -> WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.ExpandCollapseState.PartiallyExpanded = 2 -> WinUia.Patterns.ExpandCollapseState
+WinUia.Patterns.InvokePatternWrapper
+WinUia.Patterns.InvokePatternWrapper.Invoke() -> void
+WinUia.Patterns.PatternWrapper
+WinUia.Patterns.PatternWrapper.Element.get -> WinUia.Element!
+WinUia.Patterns.PatternWrapper.IsSupported.get -> bool
+WinUia.Patterns.SelectionItemPatternWrapper
+WinUia.Patterns.SelectionItemPatternWrapper.AddToSelection() -> void
+WinUia.Patterns.SelectionItemPatternWrapper.IsSelected.get -> bool
+WinUia.Patterns.SelectionItemPatternWrapper.RemoveFromSelection() -> void
+WinUia.Patterns.SelectionItemPatternWrapper.Select() -> void
+WinUia.Patterns.TogglePatternWrapper
+WinUia.Patterns.TogglePatternWrapper.State.get -> WinUia.Patterns.ToggleState
+WinUia.Patterns.TogglePatternWrapper.Toggle() -> void
+WinUia.Patterns.ToggleState
+WinUia.Patterns.ToggleState.Indeterminate = 2 -> WinUia.Patterns.ToggleState
+WinUia.Patterns.ToggleState.Off = 0 -> WinUia.Patterns.ToggleState
+WinUia.Patterns.ToggleState.On = 1 -> WinUia.Patterns.ToggleState
+WinUia.Patterns.ValuePatternWrapper
+WinUia.Patterns.ValuePatternWrapper.IsReadOnly.get -> bool
+WinUia.Patterns.ValuePatternWrapper.SetValue(string! value) -> void
+WinUia.Patterns.ValuePatternWrapper.Value.get -> string!
+WinUia.Patterns.WindowPatternWrapper
+WinUia.Patterns.WindowPatternWrapper.CanMaximize.get -> bool
+WinUia.Patterns.WindowPatternWrapper.CanMinimize.get -> bool
+WinUia.Patterns.WindowPatternWrapper.Close() -> void
+WinUia.Patterns.WindowPatternWrapper.IsModal.get -> bool
+WinUia.Patterns.WindowPatternWrapper.IsTopmost.get -> bool
+WinUia.Patterns.WindowPatternWrapper.SetVisualState(WinUia.Patterns.WindowVisualState state) -> void
+WinUia.Patterns.WindowPatternWrapper.VisualState.get -> WinUia.Patterns.WindowVisualState
+WinUia.Patterns.WindowPatternWrapper.WaitForInputIdle(System.TimeSpan timeout) -> bool
+WinUia.Patterns.WindowVisualState
+WinUia.Patterns.WindowVisualState.Maximized = 1 -> WinUia.Patterns.WindowVisualState
+WinUia.Patterns.WindowVisualState.Minimized = 2 -> WinUia.Patterns.WindowVisualState
+WinUia.Patterns.WindowVisualState.Normal = 0 -> WinUia.Patterns.WindowVisualState
+WinUia.Poll
+WinUia.ScreenPoint
+WinUia.ScreenPoint.Deconstruct(out int X, out int Y) -> void
+WinUia.ScreenPoint.Equals(WinUia.ScreenPoint other) -> bool
+WinUia.ScreenPoint.ScreenPoint() -> void
+WinUia.ScreenPoint.ScreenPoint(int X, int Y) -> void
+WinUia.ScreenPoint.X.get -> int
+WinUia.ScreenPoint.X.init -> void
+WinUia.ScreenPoint.Y.get -> int
+WinUia.ScreenPoint.Y.init -> void
+WinUia.ScreenRect
+WinUia.ScreenRect.Bottom.get -> int
+WinUia.ScreenRect.Bottom.init -> void
+WinUia.ScreenRect.Center.get -> WinUia.ScreenPoint
+WinUia.ScreenRect.Deconstruct(out int Left, out int Top, out int Right, out int Bottom) -> void
+WinUia.ScreenRect.Equals(WinUia.ScreenRect other) -> bool
+WinUia.ScreenRect.Height.get -> int
+WinUia.ScreenRect.IsEmpty.get -> bool
+WinUia.ScreenRect.Left.get -> int
+WinUia.ScreenRect.Left.init -> void
+WinUia.ScreenRect.Right.get -> int
+WinUia.ScreenRect.Right.init -> void
+WinUia.ScreenRect.ScreenRect() -> void
+WinUia.ScreenRect.ScreenRect(int Left, int Top, int Right, int Bottom) -> void
+WinUia.ScreenRect.Top.get -> int
+WinUia.ScreenRect.Top.init -> void
+WinUia.ScreenRect.Width.get -> int
+WinUia.TreeScope
+WinUia.TreeScope.Ancestors = 16 -> WinUia.TreeScope
+WinUia.TreeScope.Children = 2 -> WinUia.TreeScope
+WinUia.TreeScope.Descendants = 4 -> WinUia.TreeScope
+WinUia.TreeScope.Element = 1 -> WinUia.TreeScope
+WinUia.TreeScope.Parent = 8 -> WinUia.TreeScope
+WinUia.TreeScope.Subtree = WinUia.TreeScope.Element | WinUia.TreeScope.Children | WinUia.TreeScope.Descendants -> WinUia.TreeScope
+WinUia.UiaElementNotFoundException
+WinUia.UiaElementNotFoundException.UiaElementNotFoundException(string! message) -> void
+WinUia.UiaException
+WinUia.UiaException.UiaException(string! message, int hresult = 0, System.Exception? innerException = null) -> void
+WinUia.UiaPatternNotSupportedException
+WinUia.UiaPatternNotSupportedException.UiaPatternNotSupportedException(string! message, int hresult = -2147220988, System.Exception? innerException = null) -> void
+WinUia.UiaStaleElementException
+WinUia.UiaStaleElementException.UiaStaleElementException(string! message, int hresult = -2147220991, System.Exception? innerException = null) -> void
+WinUia.UiaTimeoutException
+WinUia.UiaTimeoutException.UiaTimeoutException(string! message, int hresult = -2146233083, System.Exception? innerException = null) -> void
+~override WinUia.ScreenPoint.Equals(object obj) -> bool
+~override WinUia.ScreenPoint.ToString() -> string
+~override WinUia.ScreenRect.Equals(object obj) -> bool
+~override WinUia.ScreenRect.ToString() -> string

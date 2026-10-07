@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <Description>Physical mouse and keyboard input (SendInput) in physical pixels, for WinUia.</Description>
-  </PropertyGroup>
-
-</Project>

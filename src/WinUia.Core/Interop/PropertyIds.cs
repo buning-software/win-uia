@@ -1,6 +1,5 @@
 namespace WinUia.Core.Interop;
 
-/// <summary>UIA property ids (UIA_*PropertyId in UIAutomationClient.h).</summary>
 internal static class PropertyIds
 {
     public const int ProcessId = 30002;

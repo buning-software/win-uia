@@ -1,0 +1,45 @@
+#nullable enable
+override WinUia.Models.AppLaunchOptions.Equals(object? obj) -> bool
+override WinUia.Models.AppLaunchOptions.GetHashCode() -> int
+override WinUia.Models.AppLaunchOptions.ToString() -> string!
+static WinUia.App.Attach(int processId) -> WinUia.App!
+static WinUia.App.Attach<TApp>(int processId) -> TApp!
+static WinUia.App.Launch(string! path, WinUia.Models.AppLaunchOptions? options = null) -> WinUia.App!
+static WinUia.App.Launch<TApp>() -> TApp!
+static WinUia.App.Launch<TApp>(string! path, WinUia.Models.AppLaunchOptions? options = null) -> TApp!
+static WinUia.App.Launch<TApp>(WinUia.Models.AppLaunchOptions? options) -> TApp!
+static WinUia.App.LaunchPackaged(string! appUserModelId, WinUia.Models.AppLaunchOptions? options = null) -> WinUia.App!
+static WinUia.Models.AppLaunchOptions.operator !=(WinUia.Models.AppLaunchOptions? left, WinUia.Models.AppLaunchOptions? right) -> bool
+static WinUia.Models.AppLaunchOptions.operator ==(WinUia.Models.AppLaunchOptions? left, WinUia.Models.AppLaunchOptions? right) -> bool
+virtual WinUia.App.DefaultOptions.get -> WinUia.Models.AppLaunchOptions!
+virtual WinUia.App.Dispose(bool disposing) -> void
+virtual WinUia.App.ExecutablePath.get -> string?
+WinUia.App
+WinUia.App.App() -> void
+WinUia.App.Close(System.TimeSpan? timeout = null) -> void
+WinUia.App.Context.get -> WinUia.AutomationContext!
+WinUia.App.Dispose() -> void
+WinUia.App.Find(string! automationIdOrName, System.TimeSpan? timeout = null) -> WinUia.Element!
+WinUia.App.FindWindow(string! title, System.TimeSpan? timeout = null) -> WinUia.Element!
+WinUia.App.MainWindow.get -> WinUia.Element!
+WinUia.App.MainWindowTimeout.get -> System.TimeSpan
+WinUia.App.MainWindowTimeout.set -> void
+WinUia.App.Process.get -> System.Diagnostics.Process!
+WinUia.App.TryFind(string! automationIdOrName, System.TimeSpan? timeout = null) -> WinUia.Element?
+WinUia.App.TryFindWindow(string! title, System.TimeSpan? timeout = null) -> WinUia.Element?
+WinUia.AppProcessException
+WinUia.AppProcessException.AppProcessException(string! message, System.Exception? innerException = null) -> void
+WinUia.Models.AppLaunchOptions
+WinUia.Models.AppLaunchOptions.<Clone>$() -> WinUia.Models.AppLaunchOptions!
+WinUia.Models.AppLaunchOptions.AppLaunchOptions() -> void
+WinUia.Models.AppLaunchOptions.Arguments.get -> string?
+WinUia.Models.AppLaunchOptions.Arguments.init -> void
+WinUia.Models.AppLaunchOptions.Environment.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string?>?
+WinUia.Models.AppLaunchOptions.Environment.init -> void
+WinUia.Models.AppLaunchOptions.Equals(WinUia.Models.AppLaunchOptions? other) -> bool
+WinUia.Models.AppLaunchOptions.MainWindowTimeout.get -> System.TimeSpan?
+WinUia.Models.AppLaunchOptions.MainWindowTimeout.init -> void
+WinUia.Models.AppLaunchOptions.ShowPointer.get -> bool?
+WinUia.Models.AppLaunchOptions.ShowPointer.init -> void
+WinUia.Models.AppLaunchOptions.WorkingDirectory.get -> string?
+WinUia.Models.AppLaunchOptions.WorkingDirectory.init -> void

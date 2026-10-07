@@ -1,4 +1,4 @@
-namespace WinUia.Core.Exceptions;
+namespace WinUia;
 
 /// <summary>Base class for all UI Automation failures raised by WinUia.</summary>
 public class UiaException : Exception

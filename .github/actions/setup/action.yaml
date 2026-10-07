@@ -1,0 +1,23 @@
+name: Setup
+description: Installs the .NET SDK, loads the NuGet cache and restores the solution. Run after checkout.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Load nuget cache
+      uses: actions/cache@v6
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/Directory.Build.props') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    # dotnet test needs the restored project assets, even when the binaries come from the build job.
+    - name: Install dependencies
+      shell: bash
+      run: dotnet restore

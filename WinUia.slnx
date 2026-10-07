@@ -3,7 +3,6 @@
     <Project Path="src/WinUia.NUnit/WinUia.NUnit.csproj" />
     <Project Path="src/WinUia/WinUia.csproj" />
     <Project Path="src/WinUia.Core/WinUia.Core.csproj" />
-    <Project Path="src/WinUia.Input/WinUia.Input.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/WinUia.UnitTests/WinUia.UnitTests.csproj" />
@@ -12,9 +11,6 @@
     <Project Path="tests/WinUia.Core.UnitTests/WinUia.Core.UnitTests.csproj" />
     <Project Path="tests/WinUia.Core.IntegrationTests/WinUia.Core.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.Core.UiTests/WinUia.Core.UiTests.csproj" />
-    <Project Path="tests/WinUia.Input.UnitTests/WinUia.Input.UnitTests.csproj" />
-    <Project Path="tests/WinUia.Input.IntegrationTests/WinUia.Input.IntegrationTests.csproj" />
-    <Project Path="tests/WinUia.Input.UiTests/WinUia.Input.UiTests.csproj" />
     <Project Path="tests/WinUia.NUnit.UnitTests/WinUia.NUnit.UnitTests.csproj" />
     <Project Path="tests/WinUia.NUnit.IntegrationTests/WinUia.NUnit.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.NUnit.UiTests/WinUia.NUnit.UiTests.csproj" />
@@ -22,7 +18,7 @@
     <Project Path="tests/WinUia.Testing.Shared/WinUia.Testing.Shared.csproj" />
   </Folder>
   <Folder Name="/examples/">
+    <Project Path="examples/WinUia.Examples.Winforms.UiTests/WinUia.Examples.Winforms.UiTests.csproj" />
     <Project Path="examples/WinUia.Examples.Winforms/WinUia.Examples.Winforms.csproj" />
-    <Project Path="examples/WinUia.Examples.Winforms.Tests/WinUia.Examples.Winforms.Tests.csproj" />
   </Folder>
 </Solution>

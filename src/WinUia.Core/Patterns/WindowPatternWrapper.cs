@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The Window pattern: top-level and MDI windows.</summary>
 public sealed class WindowPatternWrapper : PatternWrapper

@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-      The only WinUia module with a dependency: NUnit integration needs NUnit. The package asks for the lowest
-      supported version, so it overrides the central (test) version.
-    -->
+    <!-- Lowest supported NUnit for package consumers, so it overrides the central version. -->
     <PackageReference Include="NUnit" VersionOverride="4.3.2" />
-    <!-- Eventually waits the way WinUia waits (Poll). -->
     <ProjectReference Include="..\WinUia.Core\WinUia.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="buildTransitive\WinUia.NUnit.props" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 
 </Project>

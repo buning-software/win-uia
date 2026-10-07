@@ -1,7 +1,6 @@
-using WinUia.Core.Exceptions;
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>
 /// Base for control-pattern wrappers. The pattern object is fetched for every call, so a call on an element
@@ -25,13 +24,13 @@ public abstract class PatternWrapper
     public Element Element { get; }
 
     /// <summary>Whether the element currently supports this pattern.</summary>
-    public bool IsSupported => Element.Get(e => e.GetCurrentPropertyValue(_availabilityPropertyId) is true);
+    public bool IsSupported => Element.Handle.Get(e => e.GetCurrentPropertyValue(_availabilityPropertyId) is true);
 
     private protected T Call<TPattern, T>(Func<TPattern, T> call) where TPattern : class =>
-        Element.Get(e => call(Resolve<TPattern>(e)));
+        Element.Handle.Get(e => call(Resolve<TPattern>(e)));
 
     private protected void Call<TPattern>(Action<TPattern> call) where TPattern : class =>
-        Element.Do(e => call(Resolve<TPattern>(e)));
+        Element.Handle.Do(e => call(Resolve<TPattern>(e)));
 
     // GetCurrentPattern returns null when the element does not support the pattern.
     private TPattern Resolve<TPattern>(IUIAutomationElement raw) where TPattern : class =>

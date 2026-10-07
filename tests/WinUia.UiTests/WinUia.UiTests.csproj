@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <!-- The module under test. -->
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
-    <!-- Locates the test app. -->
     <ProjectReference Include="..\WinUia.Testing.Shared\WinUia.Testing.Shared.csproj" />
   </ItemGroup>
 

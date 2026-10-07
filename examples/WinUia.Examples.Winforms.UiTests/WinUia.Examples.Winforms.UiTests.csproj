@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- LibraryImport-generated code needs unsafe blocks. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NUnit.Analyzers" PrivateAssets="all" />
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
+    <ProjectReference Include="..\..\src\WinUia.NUnit\WinUia.NUnit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinUia.Examples.Winforms\WinUia.Examples.Winforms.csproj" ReferenceOutputAssembly="false" />
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>ApplicationPath</_Parameter1>
+      <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\WinUia.Examples.Winforms\bin\$(Configuration)\$(TargetFramework)\WinUia.Examples.Winforms.exe'))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="WinUia.NUnit.UiTestAttribute" />
+
+    <!-- UI Automation requires MTA. -->
+    <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
+      <_Parameter1>System.Threading.ApartmentState.MTA</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- Package users get this from WinUia.NUnit's buildTransitive; a project reference does not import it. -->
+  <Import Project="..\..\src\WinUia.NUnit\buildTransitive\WinUia.NUnit.props" />
+
+</Project>

@@ -1,12 +1,9 @@
 using System.Runtime.InteropServices;
 using WinUia.Interop;
 
-namespace WinUia.Launchers;
+namespace WinUia;
 
-/// <summary>
-/// Starts packaged (MSIX/UWP/WinUI 3) apps through <c>IApplicationActivationManager</c>, which returns the
-/// app's real process id (starting <c>explorer.exe shell:AppsFolder\...</c> only yields Explorer's).
-/// </summary>
+// IApplicationActivationManager returns the app's real process id; starting explorer.exe shell:AppsFolder\... only yields Explorer's.
 internal static class PackagedAppActivator
 {
     public static int Activate(string appUserModelId, string? arguments)

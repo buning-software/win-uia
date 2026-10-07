@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The Value pattern: controls with a string value, such as text boxes.</summary>
 public sealed class ValuePatternWrapper : PatternWrapper

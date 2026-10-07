@@ -1,6 +1,5 @@
 namespace WinUia.Interop;
 
-/// <summary>ACTIVATEOPTIONS from shobjidl_core.h.</summary>
 [Flags]
 internal enum ActivateOptions
 {

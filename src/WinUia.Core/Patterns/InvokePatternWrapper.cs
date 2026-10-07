@@ -1,6 +1,6 @@
 using WinUia.Core.Interop;
 
-namespace WinUia.Core.Patterns;
+namespace WinUia.Patterns;
 
 /// <summary>The Invoke pattern: controls that perform a single action, such as buttons.</summary>
 public sealed class InvokePatternWrapper : PatternWrapper

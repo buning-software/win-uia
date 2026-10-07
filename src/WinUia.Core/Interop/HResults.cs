@@ -1,6 +1,5 @@
 namespace WinUia.Core.Interop;
 
-/// <summary>The HRESULTs WinUia recognises: UIA's own errors (UIAutomationCoreApi.h) and the COM/RPC errors of a vanished process.</summary>
 internal static class HResults
 {
     public const int UIA_E_ELEMENTNOTENABLED = unchecked((int)0x80040200);

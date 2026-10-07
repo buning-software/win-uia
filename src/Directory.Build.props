@@ -1,37 +1,39 @@
 <Project>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
-  <!-- Settings shared by every WinUia module. -->
   <PropertyGroup>
     <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <!--
-    NuGet package metadata, the same for every module. The version is not set here: the publish workflow passes it
-    from the release tag (Version=1.2.0 for a release tagged v1.2.0); local builds keep the SDK default, 1.0.0.
-  -->
+  <!-- Version comes from the publish workflow (release tag), not from here. -->
   <PropertyGroup>
     <Authors>Buning Software</Authors>
     <Company>Buning Software</Company>
     <Copyright>Copyright © Buning Software</Copyright>
-    <PackageProjectUrl>https://github.com/BuningSoftware/win-uia</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/BuningSoftware/win-uia</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/buning-software/win-uia</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/buning-software/win-uia</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui-automation;uia;uia3;windows;automation;testing;ui-testing;winforms;wpf;winui</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <!-- Symbols go to nuget.org's symbol server as .snupkg next to each package, so users can step into WinUia. -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- After the first release, set PackageValidationBaselineVersion to it so a binary-breaking change fails the pack. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The repository README, shown on each package's nuget.org page. -->
-    <None Include="$(MSBuildThisFileDirectory)..\.github\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Every public member is listed in PublicAPI.Unshipped.txt (moved to PublicAPI.Shipped.txt at release), so a public API change shows up in review. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Each module's own test projects, e.g. WinUia.Core -> WinUia.Core.UnitTests, .IntegrationTests and .UiTests. -->
     <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
     <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
     <InternalsVisibleTo Include="$(MSBuildProjectName).UiTests" />

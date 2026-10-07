@@ -1,6 +1,5 @@
 namespace WinUia.Core.Interop;
 
-/// <summary>UIA pattern ids (UIA_*PatternId in UIAutomationClient.h).</summary>
 internal static class PatternIds
 {
     public const int Invoke = 10000;

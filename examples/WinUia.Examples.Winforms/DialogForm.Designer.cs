@@ -90,6 +90,7 @@ namespace WinUia.Examples.Winforms
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "WinUia Dialog";
+            TopMost = true;
             ResumeLayout(false);
             PerformLayout();
         }
