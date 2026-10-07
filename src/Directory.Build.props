@@ -16,6 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui-automation;uia;uia3;windows;automation;testing;ui-testing;winforms;wpf;winui</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>win-uia-logo.png</PackageIcon>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- After the first release, set PackageValidationBaselineVersion to it so a binary-breaking change fails the pack. -->
@@ -24,6 +25,7 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)../assets/win-uia-logo.png" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
   <!-- Every public member is listed in PublicAPI.Unshipped.txt (moved to PublicAPI.Shipped.txt at release), so a public API change shows up in review. -->
