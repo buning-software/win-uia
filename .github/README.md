@@ -7,6 +7,7 @@
 [![GNU Affero General Public License v3.0 License][license-shield]][license-url]
 
 <div align="center">
+  <img src="../assets/win-uia-logo.png" alt="WinUia logo" width="120" height="120">
   <h3 align="center">WinUia</h3>
   <p align="center">
     A .NET library for automating Windows applications through Microsoft UI Automation.
