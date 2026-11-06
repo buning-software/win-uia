@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.UiTests'))">
-    <!-- UI tests are tagged so that a Category!=UI test filter skips them on a machine without an interactive desktop. -->
-    <AssemblyAttribute Include="NUnit.Framework.CategoryAttribute">
-      <_Parameter1>UI</_Parameter1>
-    </AssemblyAttribute>
-
     <!-- One desktop: the lock is held for the whole test run of the assembly, across test processes. -->
     <Compile Include="$(MSBuildThisFileDirectory)DesktopLockSetUp.cs" Link="DesktopLockSetUp.cs" />
   </ItemGroup>

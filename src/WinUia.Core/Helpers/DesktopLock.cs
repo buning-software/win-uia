@@ -15,7 +15,8 @@ namespace WinUia;
 /// </summary>
 public sealed class DesktopLock : IDisposable
 {
-    internal const string Name = @"Local\WinUia.Desktop";
+    // Settable so that tests of the lock itself can use a mutex of their own instead of the machine-wide one.
+    internal static string Name { get; set; } = @"Local\WinUia.Desktop";
 
     private static readonly Lock Gate = new();
     private static Holder? s_current;

@@ -3,6 +3,15 @@ namespace WinUia.Core.IntegrationTests.Helpers;
 
 public class DesktopLockTests
 {
+    private const string MachineWideName = @"Local\WinUia.Desktop";
+
+    // The real lock is machine-wide, so other test assemblies holding it at the same moment would interfere.
+    [SetUp]
+    public void UseAMutexOfItsOwn() => DesktopLock.Name = $@"Local\WinUia.Desktop.Tests.{Guid.NewGuid():N}";
+
+    [TearDown]
+    public void UseTheMachineWideMutex() => DesktopLock.Name = MachineWideName;
+
     [Test]
     public void Disposing_the_lock_releases_the_desktop()
     {

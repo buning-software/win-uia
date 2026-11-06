@@ -27,11 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Tags the tests so that a Category!=UI test filter skips them on a machine without an interactive desktop. -->
-    <AssemblyAttribute Include="NUnit.Framework.CategoryAttribute">
-      <_Parameter1>UI</_Parameter1>
-    </AssemblyAttribute>
-
     <!-- UI Automation requires MTA. -->
     <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
       <_Parameter1>System.Threading.ApartmentState.MTA</_Parameter1>

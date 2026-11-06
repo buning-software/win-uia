@@ -96,7 +96,7 @@ dotnet add package WinUia
     dotnet test WinUia.slnx
     ```
 
-    The UI tests (`Category=UI`) launch an app (the empty `tests/WinUia.TestApp`, or `examples/WinUia.Examples.Winforms` for the examples) and need an interactive desktop. Run only the others with `dotnet test WinUia.slnx --filter "Category!=UI"`.
+    The UI tests (the `*.UiTests` projects) launch an app (the empty `tests/WinUia.TestApp`, or `examples/WinUia.Examples.Winforms` for the examples) and need an interactive desktop. Run only the others with `dotnet test WinUia.slnx --filter "FullyQualifiedName!~.UiTests."`.
 
 ## Usage
 
@@ -171,11 +171,10 @@ WinUia works with any test framework and ships no framework package, attribute o
 * **`DesktopLock.Acquire()`** is for holding the desktop longer, for example for a whole test run, or when you use `AutomationContext` directly without `App`. Locks nest within a process, so it combines with `App`.
 * **`Poll.Until(condition, timeout)`** waits for UI state that the application updates asynchronously and returns whether it came true. Assert on the result with your framework's own assertion.
 
-The rest is your framework's own: tag UI tests with a category or trait so you can filter them, set timeouts with its timeout, and run on an MTA thread (UI Automation requires it). In NUnit:
+The rest is your framework's own: tag or group UI tests however you like so you can filter them (a category, a trait, or a separate test project), set timeouts with its timeout, and run on an MTA thread (UI Automation requires it). In NUnit:
 
 ```csharp
 [assembly: Apartment(ApartmentState.MTA)]   // UI Automation requires MTA
-[assembly: Category("UI")]                  // so that --filter "Category!=UI" skips these on a machine without a desktop
 
 // In a test: Assert.That(Poll.Until(() => page.ResultLabel.Name == "Clicked"), Is.True);
 ```
@@ -208,10 +207,10 @@ Each module has up to three test projects under `tests/`, by what the tests need
 | `<Module>.IntegrationTests` | Against the real UI Automation client, Win32 and other OS objects, without showing a window | Windows |
 | `<Module>.UiTests` | Launch an app or move the real mouse and keyboard | An interactive, unlocked desktop |
 
-Every `.UiTests` project gets the category `UI` and a `DesktopLock` for the whole assembly from the build
-(`tests/Directory.Build.props`, `tests/DesktopLockSetUp.cs`), because some of its tests move the real cursor without
-an `App`, so
-`dotnet test --filter "Category!=UI"` runs the unit and integration tests on any Windows machine. UI tests launch
+Tests are selected by project name (`--filter "FullyQualifiedName~.UiTests."`), so
+`dotnet test --filter "FullyQualifiedName!~.UiTests."` runs the unit and integration tests on any Windows machine. Every
+`.UiTests` project gets a `DesktopLock` for the whole assembly from the build (`tests/Directory.Build.props`,
+`tests/DesktopLockSetUp.cs`), because some of its tests move the real cursor without an `App`. UI tests launch
 `tests/WinUia.TestApp`, an empty window, located through `tests/WinUia.Testing.Shared` (`AppPaths`). Tests of control
 behaviour (patterns, searches, self-healing elements, dialogs, input) run against the WinForms example instead, in
 `examples/WinUia.Examples.Winforms.UiTests`. Tests use NUnit.
