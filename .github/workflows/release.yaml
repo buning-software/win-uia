@@ -1,8 +1,5 @@
-name: Publish
+name: Release
 
-# nuget.org trusted publishing: it trusts this workflow (owner buning-software, repository win-uia, workflow
-# release.yaml, environment nuget) and exchanges its OIDC token for a short-lived API key; no API key is stored.
-# The nuget environment's NUGET_USER secret is the nuget.org account name.
 on:
   release:
     types: [published]
@@ -23,7 +20,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # For NuGet/login to request the OIDC token.
       id-token: write
     steps:
       - name: Checkout
@@ -73,7 +69,6 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
-      # Bash expands the glob: dotnet nuget push on Windows does not and fails with "File does not exist".
       - name: Push to nuget.org
         shell: bash
         env:
