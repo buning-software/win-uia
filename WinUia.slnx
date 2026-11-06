@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/WinUia.NUnit/WinUia.NUnit.csproj" />
     <Project Path="src/WinUia/WinUia.csproj" />
     <Project Path="src/WinUia.Core/WinUia.Core.csproj" />
   </Folder>
@@ -11,9 +10,6 @@
     <Project Path="tests/WinUia.Core.UnitTests/WinUia.Core.UnitTests.csproj" />
     <Project Path="tests/WinUia.Core.IntegrationTests/WinUia.Core.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.Core.UiTests/WinUia.Core.UiTests.csproj" />
-    <Project Path="tests/WinUia.NUnit.UnitTests/WinUia.NUnit.UnitTests.csproj" />
-    <Project Path="tests/WinUia.NUnit.IntegrationTests/WinUia.NUnit.IntegrationTests.csproj" />
-    <Project Path="tests/WinUia.NUnit.UiTests/WinUia.NUnit.UiTests.csproj" />
     <Project Path="tests/WinUia.TestApp/WinUia.TestApp.csproj" />
     <Project Path="tests/WinUia.Testing.Shared/WinUia.Testing.Shared.csproj" />
   </Folder>

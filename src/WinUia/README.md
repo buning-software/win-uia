@@ -17,5 +17,5 @@ var dialog = app.FindWindow("Save changes?");
 dialog.FindByAutomationIdOrName("Yes").Click();
 ```
 
-UI Automation must be called from an MTA thread. For NUnit tests, add `WinUia.NUnit`.
+UI Automation must be called from an MTA thread. An `App` holds the desktop (`DesktopLock`) while it is open, so test processes that drive apps take turns; dispose it when done.
 Documentation: https://github.com/buning-software/win-uia

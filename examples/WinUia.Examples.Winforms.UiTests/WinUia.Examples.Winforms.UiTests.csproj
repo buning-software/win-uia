@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
-    <ProjectReference Include="..\..\src\WinUia.NUnit\WinUia.NUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,16 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="WinUia.NUnit.UiTestAttribute" />
-
     <!-- UI Automation requires MTA. -->
     <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
       <_Parameter1>System.Threading.ApartmentState.MTA</_Parameter1>
       <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <!-- Package users get this from WinUia.NUnit's buildTransitive; a project reference does not import it. -->
-  <Import Project="..\..\src\WinUia.NUnit\buildTransitive\WinUia.NUnit.props" />
 
 </Project>

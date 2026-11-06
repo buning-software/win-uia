@@ -43,3 +43,5 @@ WinUia.Models.AppLaunchOptions.ShowPointer.get -> bool?
 WinUia.Models.AppLaunchOptions.ShowPointer.init -> void
 WinUia.Models.AppLaunchOptions.WorkingDirectory.get -> string?
 WinUia.Models.AppLaunchOptions.WorkingDirectory.init -> void
+WinUia.Models.AppLaunchOptions.DesktopTimeout.get -> System.TimeSpan?
+WinUia.Models.AppLaunchOptions.DesktopTimeout.init -> void

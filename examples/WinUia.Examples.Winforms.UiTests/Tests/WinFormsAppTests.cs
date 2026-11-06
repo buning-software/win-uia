@@ -2,7 +2,6 @@ using WinUia.Examples.Winforms.UiTests.Application;
 
 namespace WinUia.Examples.Winforms.UiTests.Tests;
 
-[UiTest]
 public class WinFormsAppTests
 {
     [Test]
