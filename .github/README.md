@@ -73,7 +73,6 @@ WinUia needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Window
 
 ```bash
 dotnet add package WinUia
-dotnet add package WinUia.NUnit   # for NUnit UI tests
 ```
 
 ### Building from source
@@ -164,6 +163,25 @@ var settings = mainForm.OpenSettings();
 In NUnit tests, put the launch and the dispose in one base fixture so each test class only writes its own setup
 (`examples/WinUia.Examples.Winforms.UiTests/Fixtures/WinFormsFixture.cs`).
 
+### Testing
+
+WinUia works with any test framework and ships no framework package, attribute or convention.
+
+* **The desktop is shared automatically.** UI tests share one mouse, one keyboard focus and one foreground window, and `dotnet test` runs test assemblies in parallel. An `App` holds the desktop (`DesktopLock`) from `Launch` or `Attach` until it is disposed, across processes, so tests that drive apps take turns with no setup. How long a test waits for another process is `AppLaunchOptions.DesktopTimeout` (default 5 minutes). Dispose the app as soon as the test is done.
+* **`DesktopLock.Acquire()`** is for holding the desktop longer, for example for a whole test run, or when you use `AutomationContext` directly without `App`. Locks nest within a process, so it combines with `App`.
+* **`Poll.Until(condition, timeout)`** waits for UI state that the application updates asynchronously and returns whether it came true. Assert on the result with your framework's own assertion.
+
+The rest is your framework's own: tag UI tests with a category or trait so you can filter them, set timeouts with its timeout, and run on an MTA thread (UI Automation requires it). In NUnit:
+
+```csharp
+[assembly: Apartment(ApartmentState.MTA)]   // UI Automation requires MTA
+[assembly: Category("UI")]                  // so that --filter "Category!=UI" skips these on a machine without a desktop
+
+// In a test: Assert.That(Poll.Until(() => page.ResultLabel.Name == "Clicked"), Is.True);
+```
+
+`examples/WinUia.Examples.Winforms.UiTests` is the complete NUnit setup. Recipes for xUnit and MSTest will follow.
+
 ### Project structure
 
 WinUia is a modular monolith: one solution, one project per module, and one test project per module. Dependencies point one way, from the application layer down to the platform:
@@ -171,15 +189,14 @@ WinUia is a modular monolith: one solution, one project per module, and one test
 | Module | Layer | Contents | Depends on |
 |---|---|---|---|
 | `WinUia` | Application | `App` (launch, attach, find, close), `AppLaunchOptions`, `AppProcessException`; internal launchers | `WinUia.Core` (public API only) |
-| `WinUia.Core` | Automation | `AutomationContext`, `Element` (lambda searches such as `Find(e => e.Name == "OK")`, self-healing locators), `WinUia.Patterns`, the `Uia*Exception` types, physical input (`WinUia.Input`: `IInputSimulator` and `Win32InputSimulator` via `SendInput`; each `AutomationContext` has one as `Input`, replaceable in tests), the UIA COM and Win32 interop | — |
-| `WinUia.NUnit` | Test integration | `[UiTest]`: one desktop per test, across test processes; `Eventually(...)` for asynchronous UI state | NUnit, `WinUia.Core` |
+| `WinUia.Core` | Automation | `AutomationContext`, `Element` (lambda searches such as `Find(e => e.Name == "OK")`, self-healing locators), `WinUia.Patterns`, the `Uia*Exception` types, physical input (`WinUia.Input`: `IInputSimulator` and `Win32InputSimulator` via `SendInput`; each `AutomationContext` has one as `Input`, replaceable in tests), `Poll` and `DesktopLock` for tests of any framework, the UIA COM and Win32 interop | — |
 
 Module rules:
 
 * Each module's `Interop/` folder is private to that module. Other modules use what it offers (`IInputSimulator`), never its P/Invoke or COM declarations.
 * Modules use each other's public API only, the same API an application built on WinUia gets.
 * Internals are shared only through `InternalsVisibleTo`, and only with the module's own test projects.
-* Folders group files by role (for example models, enumerations, exceptions, patterns, interop); a folder exists only when it has files, and test projects mirror the folders of what they test. Namespaces do not follow folders: public and internal types alike use `WinUia`, `WinUia.Patterns`, `WinUia.Input` and `WinUia.NUnit` (visibility is the `internal` keyword's job), except `Interop/`, which keeps its project's `.Interop` namespace as a fence, and `AppLaunchOptions`, which lives in `WinUia.Models`; tests follow project and folder. One type per file.
+* Folders group files by role (for example models, enumerations, exceptions, patterns, interop); a folder exists only when it has files, and test projects mirror the folders of what they test. Namespaces do not follow folders: public and internal types alike use `WinUia`, `WinUia.Patterns` and `WinUia.Input` (visibility is the `internal` keyword's job), except `Interop/`, which keeps its project's `.Interop` namespace as a fence, and `AppLaunchOptions`, which lives in `WinUia.Models`; tests follow project and folder. One type per file.
 * Package versions are set once, in `Directory.Packages.props`.
 * Every public member is listed in the package's `PublicAPI.Unshipped.txt` (moved to `PublicAPI.Shipped.txt` at release); the build fails on an unlisted change, so a public API change always shows in review.
 
@@ -191,14 +208,16 @@ Each module has up to three test projects under `tests/`, by what the tests need
 | `<Module>.IntegrationTests` | Against the real UI Automation client, Win32 and other OS objects, without showing a window | Windows |
 | `<Module>.UiTests` | Launch an app or move the real mouse and keyboard | An interactive, unlocked desktop |
 
-Every test in a `.UiTests` project gets `[UiTest]` from the build (category `UI`), so
+Every `.UiTests` project gets the category `UI` and a `DesktopLock` for the whole assembly from the build
+(`tests/Directory.Build.props`, `tests/DesktopLockSetUp.cs`), because some of its tests move the real cursor without
+an `App`, so
 `dotnet test --filter "Category!=UI"` runs the unit and integration tests on any Windows machine. UI tests launch
 `tests/WinUia.TestApp`, an empty window, located through `tests/WinUia.Testing.Shared` (`AppPaths`). Tests of control
 behaviour (patterns, searches, self-healing elements, dialogs, input) run against the WinForms example instead, in
 `examples/WinUia.Examples.Winforms.UiTests`. Tests use NUnit.
 
 `examples/` shows WinUia the way a user would use it: `WinUia.Examples.Winforms` is a WinForms app and
-`WinUia.Examples.Winforms.UiTests` tests it with page objects, using only WinUia's public API and `WinUia.NUnit`, nothing
+`WinUia.Examples.Winforms.UiTests` tests it with page objects, using only WinUia's public API and NUnit, nothing
 from `tests/`. Examples and tests are independent: neither references the other.
 
 ### Limitations

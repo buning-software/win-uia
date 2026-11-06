@@ -31,6 +31,12 @@ public sealed record AppLaunchOptions
     /// <summary>How long <see cref="App.MainWindow"/> waits for the window to appear. Null keeps the default (20 seconds).</summary>
     public TimeSpan? MainWindowTimeout { get; init; }
 
+    /// <summary>
+    /// How long to wait for another test process to give the desktop back (<see cref="DesktopLock"/>) before throwing
+    /// <see cref="TimeoutException"/>. Null keeps the default (5 minutes).
+    /// </summary>
+    public TimeSpan? DesktopTimeout { get; init; }
+
     internal AppLaunchOptions OverriddenBy(AppLaunchOptions? overrides) => overrides is null ? this : new AppLaunchOptions
     {
         Arguments = overrides.Arguments ?? Arguments,
@@ -38,5 +44,6 @@ public sealed record AppLaunchOptions
         Environment = overrides.Environment ?? Environment,
         ShowPointer = overrides.ShowPointer ?? ShowPointer,
         MainWindowTimeout = overrides.MainWindowTimeout ?? MainWindowTimeout,
+        DesktopTimeout = overrides.DesktopTimeout ?? DesktopTimeout,
     };
 }

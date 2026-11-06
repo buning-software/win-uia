@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
-    <ProjectReference Include="..\..\src\WinUia.NUnit\WinUia.NUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="WinUia.NUnit.UiTestAttribute" />
+    <!-- Tags the tests so that a Category!=UI test filter skips them on a machine without an interactive desktop. -->
+    <AssemblyAttribute Include="NUnit.Framework.CategoryAttribute">
+      <_Parameter1>UI</_Parameter1>
+    </AssemblyAttribute>
 
     <!-- UI Automation requires MTA. -->
     <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
@@ -36,8 +38,5 @@
       <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <!-- Package users get this from WinUia.NUnit's buildTransitive; a project reference does not import it. -->
-  <Import Project="..\..\src\WinUia.NUnit\buildTransitive\WinUia.NUnit.props" />
 
 </Project>

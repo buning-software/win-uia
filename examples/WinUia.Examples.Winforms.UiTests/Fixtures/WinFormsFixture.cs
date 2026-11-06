@@ -17,4 +17,7 @@ public abstract class WinFormsFixture
 
     [TearDown]
     public void CloseApp() => WinFormsApp.Dispose();
+
+    protected static void Eventually(Func<bool> condition, string because = "") =>
+        Assert.That(Poll.Until(condition), Is.True, because);
 }

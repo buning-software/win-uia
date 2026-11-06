@@ -250,3 +250,6 @@ WinUia.UiaTimeoutException.UiaTimeoutException(string! message, int hresult = -2
 ~override WinUia.ScreenPoint.ToString() -> string
 ~override WinUia.ScreenRect.Equals(object obj) -> bool
 ~override WinUia.ScreenRect.ToString() -> string
+WinUia.DesktopLock
+WinUia.DesktopLock.Dispose() -> void
+static WinUia.DesktopLock.Acquire(System.TimeSpan? timeout = null) -> WinUia.DesktopLock!

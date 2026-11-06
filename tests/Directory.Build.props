@@ -15,8 +15,6 @@
 
     <Using Include="NUnit.Framework" />
 
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\WinUia.NUnit\WinUia.NUnit.csproj" />
-
     <!-- UI Automation requires MTA; UI tests must not run in parallel (one desktop). -->
     <AssemblyAttribute Include="NUnit.Framework.ApartmentAttribute">
       <_Parameter1>System.Threading.ApartmentState.MTA</_Parameter1>
@@ -24,9 +22,13 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)..\src\WinUia.NUnit\buildTransitive\WinUia.NUnit.props" Condition="'$(IsUnitTestProject)' == 'true'" />
-
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.UiTests'))">
-    <AssemblyAttribute Include="WinUia.NUnit.UiTestAttribute" />
+    <!-- UI tests are tagged so that a Category!=UI test filter skips them on a machine without an interactive desktop. -->
+    <AssemblyAttribute Include="NUnit.Framework.CategoryAttribute">
+      <_Parameter1>UI</_Parameter1>
+    </AssemblyAttribute>
+
+    <!-- One desktop: the lock is held for the whole test run of the assembly, across test processes. -->
+    <Compile Include="$(MSBuildThisFileDirectory)DesktopLockSetUp.cs" Link="DesktopLockSetUp.cs" />
   </ItemGroup>
 </Project>

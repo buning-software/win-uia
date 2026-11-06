@@ -7,7 +7,7 @@ public class AppLaunchOptionsTests
     [Test]
     public void Options_override_defaults_property_by_property()
     {
-        var defaults = new AppLaunchOptions { Arguments = "--default", ShowPointer = true, MainWindowTimeout = TimeSpan.FromSeconds(7) };
+        var defaults = new AppLaunchOptions { Arguments = "--default", ShowPointer = true, MainWindowTimeout = TimeSpan.FromSeconds(7), DesktopTimeout = TimeSpan.FromMinutes(1) };
 
         var effective = defaults.OverriddenBy(new AppLaunchOptions { ShowPointer = false, WorkingDirectory = @"C:\work" });
 
@@ -17,6 +17,7 @@ public class AppLaunchOptionsTests
             WorkingDirectory = @"C:\work",
             ShowPointer = false,
             MainWindowTimeout = TimeSpan.FromSeconds(7),
+            DesktopTimeout = TimeSpan.FromMinutes(1),
         }));
     }
 

@@ -18,11 +18,17 @@ namespace WinUia;
 /// Must be used from an MTA thread (see <see cref="AutomationContext"/>); creating it on an STA thread throws.
 /// Disposing an app that was launched closes it; disposing an attached app leaves it running.
 /// </para>
+/// <para>
+/// An app holds the desktop (<see cref="DesktopLock"/>) from when it is launched or attached until it is disposed, so test
+/// processes that drive apps at the same time take turns instead of fighting over the mouse, the keyboard focus and the
+/// foreground window. Dispose it as soon as you are done.
+/// </para>
 /// </summary>
 public class App : IDisposable
 {
     private Process? _process;
     private AutomationContext? _context;
+    private DesktopLock? _desktop;
     private bool _ownsProcess;
     private bool _disposed;
 
@@ -42,7 +48,8 @@ public class App : IDisposable
     /// <summary>
     /// How a page object is launched or attached unless the caller says otherwise: the options passed to a factory
     /// override these property by property, and an option left empty in both keeps WinUia's default. Attaching uses
-    /// only <see cref="AppLaunchOptions.ShowPointer"/> and <see cref="AppLaunchOptions.MainWindowTimeout"/>.
+    /// only <see cref="AppLaunchOptions.ShowPointer"/>, <see cref="AppLaunchOptions.MainWindowTimeout"/> and
+    /// <see cref="AppLaunchOptions.DesktopTimeout"/>.
     /// </summary>
     protected virtual AppLaunchOptions DefaultOptions => new();
 
@@ -170,6 +177,7 @@ public class App : IDisposable
         {
             _process.Dispose();
             _context.Dispose();
+            _desktop?.Dispose();
         }
     }
 
@@ -181,6 +189,7 @@ public class App : IDisposable
         var effective = connected.DefaultOptions.OverriddenBy(options);
 
         var context = new AutomationContext();
+        DesktopLock? desktop = null;
         try
         {
             if (effective.ShowPointer is { } showPointer)
@@ -188,13 +197,16 @@ public class App : IDisposable
             if (effective.MainWindowTimeout is { } mainWindowTimeout)
                 connected.MainWindowTimeout = mainWindowTimeout;
 
+            desktop = DesktopLock.Acquire(effective.DesktopTimeout);
             connected._process = connect(effective);
             connected._context = context;
+            connected._desktop = desktop;
             connected._ownsProcess = ownsProcess;
             return app;
         }
         catch
         {
+            desktop?.Dispose();
             context.Dispose();
             throw;
         }
