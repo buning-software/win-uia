@@ -1,7 +1,7 @@
 name: Publish
 
 # nuget.org trusted publishing: it trusts this workflow (owner buning-software, repository win-uia, workflow
-# publish.yaml, environment nuget) and exchanges its OIDC token for a short-lived API key; no API key is stored.
+# release.yaml, environment nuget) and exchanges its OIDC token for a short-lived API key; no API key is stored.
 # The nuget environment's NUGET_USER secret is the nuget.org account name.
 on:
   release:
