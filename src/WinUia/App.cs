@@ -29,6 +29,7 @@ public class App : IDisposable
     private Process? _process;
     private AutomationContext? _context;
     private DesktopLock? _desktop;
+    private IDisposable? _recording;
     private bool _ownsProcess;
     private bool _disposed;
 
@@ -55,14 +56,14 @@ public class App : IDisposable
 
     /// <summary>Starts a classic executable. Throws <see cref="AppProcessException"/> when it cannot be started.</summary>
     public static App Launch(string path, AppLaunchOptions? options = null) =>
-        Start(new App(), effective => AppLauncher.LaunchExe(path, effective), options);
+        Start(new App(), path, effective => AppLauncher.LaunchExe(path, effective), options);
 
     /// <summary>
     /// Starts a classic executable as <typeparamref name="TApp"/>, a page object that derives from <see cref="App"/>:
     /// <c>App.Launch&lt;MainPage&gt;(path)</c>. Throws <see cref="AppProcessException"/> when it cannot be started.
     /// </summary>
     public static TApp Launch<TApp>(string path, AppLaunchOptions? options = null) where TApp : App, new() =>
-        Start(new TApp(), effective => AppLauncher.LaunchExe(path, effective), options);
+        Start(new TApp(), path, effective => AppLauncher.LaunchExe(path, effective), options);
 
     /// <summary>
     /// Starts the executable <typeparamref name="TApp"/> declares (<see cref="ExecutablePath"/>) as that page object:
@@ -81,7 +82,7 @@ public class App : IDisposable
             $"{typeof(TApp).Name} does not say which executable it launches. Override {nameof(ExecutablePath)} in " +
             $"{typeof(TApp).Name}, or pass the path: App.Launch<{typeof(TApp).Name}>(path).");
 
-        return Start(app, effective => AppLauncher.LaunchExe(path, effective), options);
+        return Start(app, path, effective => AppLauncher.LaunchExe(path, effective), options);
     }
 
     /// <summary>
@@ -90,15 +91,15 @@ public class App : IDisposable
     /// <see cref="AppLaunchOptions.Environment"/>, which Windows decides for packaged apps.
     /// </summary>
     public static App LaunchPackaged(string appUserModelId, AppLaunchOptions? options = null) =>
-        Start(new App(), effective => AppLauncher.LaunchPackaged(appUserModelId, effective), options);
+        Start(new App(), appUserModelId, effective => AppLauncher.LaunchPackaged(appUserModelId, effective), options);
 
     /// <summary>Attaches to a running process by id. Throws <see cref="AppProcessException"/> when it is not running.</summary>
     public static App Attach(int processId) =>
-        Start(new App(), _ => AppLauncher.Attach(processId), options: null, ownsProcess: false);
+        Start(new App(), null, _ => AppLauncher.Attach(processId), options: null, ownsProcess: false);
 
     /// <summary>Like <see cref="Attach(int)"/>, as <typeparamref name="TApp"/>.</summary>
     public static TApp Attach<TApp>(int processId) where TApp : App, new() =>
-        Start(new TApp(), _ => AppLauncher.Attach(processId), options: null, ownsProcess: false);
+        Start(new TApp(), null, _ => AppLauncher.Attach(processId), options: null, ownsProcess: false);
 
     /// <summary>The automation context used for this app.</summary>
     public AutomationContext Context => _context ?? throw NotConnected();
@@ -175,14 +176,28 @@ public class App : IDisposable
         }
         finally
         {
-            _process.Dispose();
-            _context.Dispose();
-            _desktop?.Dispose();
+            try
+            {
+                _process.Dispose();
+                _context.Dispose();
+            }
+            finally
+            {
+                // Stops after the app has closed, and before the desktop is given back.
+                try
+                {
+                    _recording?.Dispose();
+                }
+                finally
+                {
+                    _desktop?.Dispose();
+                }
+            }
         }
     }
 
     // The context is created before the process so an STA thread fails before anything is started.
-    private static TApp Start<TApp>(TApp app, Func<AppLaunchOptions, Process> connect, AppLaunchOptions? options,
+    private static TApp Start<TApp>(TApp app, string? target, Func<AppLaunchOptions, Process> connect, AppLaunchOptions? options,
         bool ownsProcess = true) where TApp : App
     {
         App connected = app; // Private and protected members are reachable only through the base type.
@@ -190,6 +205,7 @@ public class App : IDisposable
 
         var context = new AutomationContext();
         DesktopLock? desktop = null;
+        IDisposable? recording = null;
         try
         {
             if (effective.ShowPointer is { } showPointer)
@@ -198,16 +214,30 @@ public class App : IDisposable
                 connected.MainWindowTimeout = mainWindowTimeout;
 
             desktop = DesktopLock.Acquire(effective.DesktopTimeout);
+
+            // Before the process starts, so the recording shows the launch. Not when attaching: nothing is launched.
+            if (ownsProcess)
+                recording = effective.Recording?.Start(new AppRecordingContext(target ?? string.Empty, effective));
+
             connected._process = connect(effective);
             connected._context = context;
             connected._desktop = desktop;
+            connected._recording = recording;
             connected._ownsProcess = ownsProcess;
             return app;
         }
         catch
         {
-            desktop?.Dispose();
-            context.Dispose();
+            try
+            {
+                recording?.Dispose();
+            }
+            finally
+            {
+                desktop?.Dispose();
+                context.Dispose();
+            }
+
             throw;
         }
     }

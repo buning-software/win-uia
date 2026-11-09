@@ -45,3 +45,11 @@ WinUia.Models.AppLaunchOptions.WorkingDirectory.get -> string?
 WinUia.Models.AppLaunchOptions.WorkingDirectory.init -> void
 WinUia.Models.AppLaunchOptions.DesktopTimeout.get -> System.TimeSpan?
 WinUia.Models.AppLaunchOptions.DesktopTimeout.init -> void
+WinUia.Models.AppLaunchOptions.Recording.get -> WinUia.Models.IAppRecorder?
+WinUia.Models.AppLaunchOptions.Recording.init -> void
+WinUia.Models.IAppRecorder
+WinUia.Models.AppRecordingContext
+WinUia.Models.AppRecordingContext.AppRecordingContext(string! target, WinUia.Models.AppLaunchOptions! options) -> void
+WinUia.Models.AppRecordingContext.Options.get -> WinUia.Models.AppLaunchOptions!
+WinUia.Models.AppRecordingContext.Target.get -> string!
+WinUia.Models.IAppRecorder.Start(WinUia.Models.AppRecordingContext! context) -> System.IDisposable!

@@ -1,9 +1,15 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/WinUia.Recording/WinUia.Recording.csproj" />
+    <Project Path="src/WinUia.Recording.NUnit/WinUia.Recording.NUnit.csproj" />
     <Project Path="src/WinUia/WinUia.csproj" />
     <Project Path="src/WinUia.Core/WinUia.Core.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/WinUia.Recording.UnitTests/WinUia.Recording.UnitTests.csproj" />
+    <Project Path="tests/WinUia.Recording.IntegrationTests/WinUia.Recording.IntegrationTests.csproj" />
+    <Project Path="tests/WinUia.Recording.UiTests/WinUia.Recording.UiTests.csproj" />
+    <Project Path="tests/WinUia.Recording.NUnit.UnitTests/WinUia.Recording.NUnit.UnitTests.csproj" />
     <Project Path="tests/WinUia.UnitTests/WinUia.UnitTests.csproj" />
     <Project Path="tests/WinUia.IntegrationTests/WinUia.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.UiTests/WinUia.UiTests.csproj" />

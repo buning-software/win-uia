@@ -9,9 +9,6 @@ namespace WinUia;
 /// <see cref="AutomationContext"/> without <c>App</c>. Within a process locks nest: while one is held, further
 /// <see cref="Acquire"/> calls succeed at once, and the desktop is given back when the last one is disposed.
 /// </para>
-/// <code>
-/// using var desktop = DesktopLock.Acquire();
-/// </code>
 /// </summary>
 public sealed class DesktopLock : IDisposable
 {

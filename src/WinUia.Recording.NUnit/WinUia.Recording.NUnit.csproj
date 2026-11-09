@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>NUnit support for WinUia.Recording: names the video after the test, keeps it when the test failed and attaches it to the test result.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinUia.Recording\WinUia.Recording.csproj" />
+    <PackageReference Include="NUnit" />
+  </ItemGroup>
+
+</Project>

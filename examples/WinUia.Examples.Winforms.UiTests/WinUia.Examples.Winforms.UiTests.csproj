@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
+    <ProjectReference Include="..\..\src\WinUia.Recording.NUnit\WinUia.Recording.NUnit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

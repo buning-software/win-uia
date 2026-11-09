@@ -37,6 +37,13 @@ public sealed record AppLaunchOptions
     /// </summary>
     public TimeSpan? DesktopTimeout { get; init; }
 
+    /// <summary>
+    /// Records the app while it runs, for example <c>new RecordingOptions()</c> from the <c>WinUia.Recording</c> package.
+    /// Started on launch and stopped when the app is disposed; ignored when attaching to a running process.
+    /// Null (the default) records nothing.
+    /// </summary>
+    public IAppRecorder? Recording { get; init; }
+
     internal AppLaunchOptions OverriddenBy(AppLaunchOptions? overrides) => overrides is null ? this : new AppLaunchOptions
     {
         Arguments = overrides.Arguments ?? Arguments,
@@ -45,5 +52,6 @@ public sealed record AppLaunchOptions
         ShowPointer = overrides.ShowPointer ?? ShowPointer,
         MainWindowTimeout = overrides.MainWindowTimeout ?? MainWindowTimeout,
         DesktopTimeout = overrides.DesktopTimeout ?? DesktopTimeout,
+        Recording = overrides.Recording ?? Recording,
     };
 }

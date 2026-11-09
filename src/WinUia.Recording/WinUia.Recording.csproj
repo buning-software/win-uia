@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Record the screen while a Windows UI test runs, using ffmpeg. Optional companion to WinUia: pass RecordingOptions in AppLaunchOptions.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinUia\WinUia.csproj" />
+  </ItemGroup>
+
+</Project>

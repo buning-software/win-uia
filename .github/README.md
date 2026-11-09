@@ -10,7 +10,7 @@
   <img src="../assets/win-uia-logo.png" alt="WinUia logo" width="120" height="120">
   <h3 align="center">WinUia</h3>
   <p align="center">
-    A .NET library for automating Windows applications through Microsoft UI Automation.
+    A modern, high-performance C# library for Windows UI Automation, desktop app testing, and accessibility tooling.
     <br />
     <a href="https://github.com/buning-software/win-uia/issues">Report Bug</a>
     ·
@@ -25,8 +25,8 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#features">Features</a></li>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#features">Features</a></li>
       </ul>
     </li>
     <li>
@@ -39,6 +39,7 @@
     <li>
       <a href="#usage">Usage</a>
       <ul>
+        <li><a href="#setting-up-your-application">Setting up your application</a></li>
         <li><a href="#limitations">Limitations</a></li>
       </ul>
     </li>
@@ -53,6 +54,11 @@
 
 WinUia is a .NET library for inspecting and automating Windows applications through the Microsoft UI Automation framework.
 
+### Built With
+
+* [.NET 10](https://dotnet.microsoft.com/)
+* [Microsoft UI Automation](https://learn.microsoft.com/windows/win32/winauto/entry-uiauto-win32)
+
 ### Features
 
 * **No dependencies:** talks to the native UIA3 COM API (`UIAutomationCore.dll`) through hand-written interop. No FlaUI, no interop packages.
@@ -61,13 +67,8 @@ WinUia is a .NET library for inspecting and automating Windows applications thro
 * **Waiting built in:** `Find` polls until the element appears (default 5 s), `TryFind` returns `null` instead of throwing.
 * **Patterns first, mouse last:** `Click()` and `SetValue()` use UIA patterns (Invoke, Toggle, SelectionItem, ExpandCollapse, Value) and only fall back to `SendInput`.
 
-### Built With
-
-* [.NET 10](https://dotnet.microsoft.com/)
-* [Microsoft UI Automation](https://learn.microsoft.com/windows/win32/winauto/entry-uiauto-win32)
-
 ## Getting Started
-WinUia needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Windows.
+WinUia needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Windows 10 or 11. Tests that drive an app need an interactive, unlocked desktop. Use Visual Studio 2022 or later, or any editor with the `dotnet` CLI; the Windows SDK is not required to use the package.
 
 ### Installation
 
@@ -75,93 +76,96 @@ WinUia needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Window
 dotnet add package WinUia
 ```
 
+Optional: `WinUia.Recording` records the screen with ffmpeg while a test runs, so a failing CI test leaves a video.
+
+```bash
+dotnet add package WinUia.Recording
+```
+
+```csharp
+// In your App page object: record every launch.
+protected override AppLaunchOptions DefaultOptions => new() { Recording = new RecordingOptions() };
+```
+
+[ffmpeg](https://ffmpeg.org) is not bundled: install it and put it on `PATH`, or point the `WINUIA_FFMPEG` environment variable at `ffmpeg.exe`. Projects that don't use the package are unaffected. See the [package README](../src/WinUia.Recording/README.md) for keeping only failed tests and the other options.
+
 ### Building from source
 
-1.  **Clone the repository:**
+```bash
+git clone https://github.com/buning-software/win-uia.git
+cd win-uia
+dotnet build WinUia.slnx
+dotnet test WinUia.slnx
+```
 
-    ```bash
-    git clone https://github.com/buning-software/win-uia.git
-    cd win-uia
-    ```
-
-2.  **Build the solution:**
-
-    ```bash
-    dotnet build WinUia.slnx
-    ```
-
-3.  **Run the tests:**
-
-    ```bash
-    dotnet test WinUia.slnx
-    ```
-
-    The UI tests (the `*.UiTests` projects) launch an app (the empty `tests/WinUia.TestApp`, or `examples/WinUia.Examples.Winforms` for the examples) and need an interactive desktop. Run only the others with `dotnet test WinUia.slnx --filter "FullyQualifiedName!~.UiTests."`.
+The UI tests (the `*.UiTests` projects) launch an app and need an interactive desktop. Run only the others with `dotnet test WinUia.slnx --filter "FullyQualifiedName!~.UiTests."`.
 
 ## Usage
+
+Test a calculator app in a few lines:
 
 ```csharp
 using WinUia;
 
-using var app = App.Launch(@"C:\path\to\MyApp.exe");   // or App.LaunchPackaged("Publisher.App_hash!App"), App.Attach(pid)
+using var app = App.Launch(@"C:\path\to\Calculator.exe");   // or App.LaunchPackaged(appId), App.Attach(pid)
 
-app.Find("txtName").SetValue("Ada");                 // by AutomationId, then by Name
-app.Find("btnSave").Click();
+app.Find("btn2").Click();       // by AutomationId, then by Name
+app.Find("btnPlus").Click();
+app.Find("btn3").Click();
+app.Find("btnEquals").Click();
 
-var status = app.MainWindow.FindByAutomationId("lblStatus", TimeSpan.FromSeconds(10));
-Console.WriteLine(status.Name);
-
-var dialog = app.FindWindow("Save changes?");        // a dialog or other window of the app
-dialog.Find(e => e.ControlType == ControlType.Button && e.Name == "Yes").Click();
+Console.WriteLine(app.Find("txtResult").GetText());   // "5"
 // Disposing a launched app closes it (Window pattern first, then kill).
 ```
 
 `Element`'s own methods (`Click`, `SetValue`, `GetText`, `Toggle`, `Select`, `Expand`, `Collapse`) are the everyday API:
 they check the element is enabled and pick the right pattern. The pattern wrappers (`element.TogglePattern.State`,
 `element.WindowPattern.Close()`, ...) are for reading pattern state and for the members those methods do not cover.
+Other windows of the app, such as dialogs, are found with `app.FindWindow("Save changes?")`, and any element can be
+searched with a lambda: `window.Find(e => e.ControlType == ControlType.Button && e.Name == "Yes")`.
 
-An application can have its own class that derives from `App` and says which executable it is and how it starts by
-default, so tests launch it without repeating either; the generic factories (`App.Launch<T>`, `App.Attach<T>`) create it already connected. `AppLaunchOptions` sets the arguments, working directory, environment,
-pointer and main-window timeout; options passed to a factory override those defaults one by one.
+### Setting up your application
 
-The app owns the process, so it is the one thing you dispose. What is on screen is described by page objects: plain
-classes that read the app and own nothing, so they need no teardown. A page for part of the window, such as a tab, can
-derive from the main window's page and so reach its controls too (see `examples/WinUia.Examples.Winforms.UiTests`):
+`examples/WinUia.Examples.Winforms.UiTests` is a complete test project for the WinForms app next to it. To do the same for your app:
 
-```csharp
-using WinUia;
-using WinUia.Models;   // AppLaunchOptions
+1.  **Create a test project** that targets Windows and references `WinUia` and your test framework (the example uses NUnit).
 
-public sealed class MyApp : App
-{
-    protected override string ExecutablePath => @"C:\path\to\MyApp.exe";
-    protected override AppLaunchOptions DefaultOptions => new() { ShowPointer = true };
-}
+2.  **Derive a class from `App`** that says which executable it is and how it starts, so tests launch it without repeating either. The example project builds the app first and passes its path in as assembly metadata; a fixed path works too.
 
-public class MainForm(MyApp app)
-{
-    public Element Window => app.MainWindow;
-    public Element SaveButton => Window.FindByAutomationId("btnSave");
-    public SettingsTab OpenSettings() { Window.FindByAutomationId("tabSettings").Select(); return new SettingsTab(app); }
-}
+    ```csharp
+    using WinUia;
+    using WinUia.Models;   // AppLaunchOptions
 
-public class SettingsTab(MyApp app) : MainForm(app)      // has SaveButton and OpenSettings() as well
-{
-    public Element Content => Window.FindByAutomationId("lblSettings");
-}
+    public sealed class MyApp : App
+    {
+        protected override string ExecutablePath => @"C:\path\to\MyApp.exe";
+        protected override AppLaunchOptions DefaultOptions => new() { ShowPointer = true };
+    }
+    ```
 
-using var app = App.Launch<MyApp>();                                            // its executable and defaults
-using var quiet = App.Launch<MyApp>(options: new AppLaunchOptions { ShowPointer = false }); // one default overridden
-using var other = App.Launch<MyApp>(@"D:\builds\MyApp.exe");                      // another executable
+    The generic factories (`App.Launch<T>`, `App.Attach<T>`) create it already connected. `AppLaunchOptions` sets the arguments, working directory, environment, pointer and main-window timeout; options passed to a factory override those defaults one by one:
 
-var mainForm = new MainForm(app);
-mainForm.SaveButton.Click();
-var settings = mainForm.OpenSettings();
-// Disposing the app closes it; the pages need nothing.
-```
+    ```csharp
+    using var app = App.Launch<MyApp>();                                                          // its executable and defaults
+    using var quiet = App.Launch<MyApp>(options: new AppLaunchOptions { ShowPointer = false });   // one default overridden
+    using var other = App.Launch<MyApp>(@"D:\builds\MyApp.exe");                                  // another executable
+    ```
 
-In NUnit tests, put the launch and the dispose in one base fixture so each test class only writes its own setup
-(`examples/WinUia.Examples.Winforms.UiTests/Fixtures/WinFormsFixture.cs`).
+3.  **Describe what is on screen with page objects.** The app owns the process, so it is the one thing you dispose. Pages are plain classes that read the app and own nothing, so they need no teardown. A page for part of the window, such as a tab, can derive from the main window's page and so reach its controls too:
+
+    ```csharp
+    public class MainForm(MyApp app)
+    {
+        public Element Window => app.MainWindow;
+        public Element SaveButton => Window.FindByAutomationId("btnSave");
+        public SettingsTab OpenSettings() { Window.FindByAutomationId("tabSettings").Select(); return new SettingsTab(app); }
+    }
+
+    public class SettingsTab(MyApp app) : MainForm(app)      // has SaveButton and OpenSettings() as well
+    {
+        public Element Content => Window.FindByAutomationId("lblSettings");
+    }
+    ```
 
 ### Testing
 

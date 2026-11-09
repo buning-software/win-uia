@@ -3,7 +3,17 @@ name: Build and test
 on:
   pull_request:
   workflow_dispatch:
-  workflow_call: {}
+    inputs:
+      record-all-tests:
+        description: Keep a screen recording of every UI test, not only failed ones
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      record-all-tests:
+        description: Keep a screen recording of every UI test, not only failed ones
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -94,14 +104,29 @@ jobs:
         with:
           name: build-output
 
+      # Screen recordings (WinUia.Recording) need ffmpeg; install it when the runner image lacks it.
+      - name: Ensure ffmpeg
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg --no-progress -y
+          }
+          $ffmpeg = (Get-Command ffmpeg).Source
+          Write-Host "ffmpeg: $ffmpeg"
+          "WINUIA_FFMPEG=$ffmpeg" >> $env:GITHUB_ENV
+
       - name: UI test
+        env:
+          WINUIA_RECORDING: ${{ inputs.record-all-tests && 'all' || 'failed' }}
+          WINUIA_RECORDING_DIR: ${{ github.workspace }}/TestResults/Recordings
         run: >-
           dotnet test --no-build --configuration Release --logger GitHubActions --logger trx
           --results-directory TestResults --filter "FullyQualifiedName~.UiTests."
 
       - name: Upload UI test results
-        if: failure()
+        if: failure() || inputs.record-all-tests
         uses: actions/upload-artifact@v7
         with:
           name: ui-test-results
           path: TestResults
+          retention-days: 14
