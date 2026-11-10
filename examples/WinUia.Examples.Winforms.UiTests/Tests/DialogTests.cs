@@ -46,8 +46,6 @@ public sealed class DialogTests : WinFormsFixture
         dialog.CancelButton.Click();
 
         Eventually(() => MainForm.ResultLabel.Name == "Dialog: Cancel");
-
-        throw new InvalidOperationException("Deliberate failure to check failed-test recording.");
     }
 
     [Test]
