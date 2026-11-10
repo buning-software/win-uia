@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using static System.Threading.Timeout;
+
 namespace WinUia;
 
 /// <summary>
@@ -31,14 +34,15 @@ public sealed class DesktopLock : IDisposable
     public static DesktopLock Acquire(TimeSpan? timeout = null)
     {
         var wait = timeout ?? TimeSpan.FromMinutes(5);
-        var started = DateTime.UtcNow;
+        var infinite = wait == InfiniteTimeSpan;
+        var started = Stopwatch.GetTimestamp();
 
         // Another thread of this process may be waiting for the desktop; it holds the gate until it has it or gives up.
         if (!Gate.TryEnter(wait))
             throw Timeout(wait);
         try
         {
-            s_current ??= Holder.Take(wait - (DateTime.UtcNow - started));
+            s_current ??= Holder.Take(infinite ? wait : wait - Stopwatch.GetElapsedTime(started));
             s_current.Count++;
             return new DesktopLock(s_current);
         }
@@ -65,7 +69,7 @@ public sealed class DesktopLock : IDisposable
     }
 
     private static TimeoutException Timeout(TimeSpan wait) =>
-        new($"Another process kept the desktop (UI lock '{Name}') for more than {wait}.");
+        new($"Another process kept the desktop (UI lock '{Name}') for more than {(wait == InfiniteTimeSpan ? "the timeout" : wait)}.");
 
     // A mutex must be released by the thread that took it, and setup and teardown may run on different threads, so a
     // dedicated thread owns it while the lock is held.
@@ -90,7 +94,7 @@ public sealed class DesktopLock : IDisposable
 
         internal static Holder Take(TimeSpan timeout)
         {
-            var wait = timeout > TimeSpan.Zero ? timeout : TimeSpan.Zero;
+            var wait = timeout == InfiniteTimeSpan || timeout > TimeSpan.Zero ? timeout : TimeSpan.Zero;
             var acquired = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var holder = new Holder(wait, acquired);
             try

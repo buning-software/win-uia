@@ -11,21 +11,25 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
 {
     public IDisposable Start(AppRecordingContext context)
     {
-        var mode = RecordingModes.Resolve(options.Mode, getEnvironmentVariable(RecordingModes.EnvironmentVariable));
+        var environmentMode = getEnvironmentVariable(RecordingModes.EnvironmentVariable);
+        if (!string.IsNullOrWhiteSpace(environmentMode) && RecordingModes.Parse(environmentMode) is null)
+            Warn($"ignoring {RecordingModes.EnvironmentVariable}='{environmentMode}'; use failed, all or off.");
+
+        var mode = RecordingModes.Resolve(options.Mode, environmentMode);
         if (mode == RecordingMode.Off)
             return Nothing.Instance;
 
         var recorder = options.Recorder;
 
-        // A launch must not fail because the recorder is unavailable (a machine without ffmpeg, say): warn and run without a video.
-        if (recorder.UnavailableReason is { } reason)
-        {
-            Warn($"this run is not recorded. {reason}");
-            return Nothing.Instance;
-        }
-
         try
         {
+            // A launch must not fail because the recorder is unavailable (a machine without ffmpeg, say): warn and run without a video.
+            if (recorder.UnavailableReason is { } reason)
+            {
+                Warn($"this run is not recorded. {reason}");
+                return Nothing.Instance;
+            }
+
             var name = ChooseName(context);
             var directory = options.OutputDirectory ?? getEnvironmentVariable(RecordingFile.DirectoryEnvironmentVariable);
             var path = RecordingFile.Choose(directory, name, recorder.FileExtension);

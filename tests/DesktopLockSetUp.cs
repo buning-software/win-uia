@@ -8,7 +8,7 @@ public sealed class DesktopLockSetUp
     private DesktopLock? _desktop;
 
     [OneTimeSetUp]
-    public void TakeDesktop() => _desktop = DesktopLock.Acquire();
+    public void TakeDesktop() => _desktop = DesktopLock.Acquire(TimeSpan.FromMinutes(60));
 
     [OneTimeTearDown]
     public void ReleaseDesktop() => _desktop?.Dispose();

@@ -35,7 +35,8 @@ internal sealed class FfmpegProcess : IDisposable
         }
 
         // gdigrab is not DPI-aware; without this, offsets and size (physical pixels) are misread on scaled displays.
-        startInfo.Environment["__COMPAT_LAYER"] = "HighDpiAware";
+        startInfo.Environment.TryGetValue("__COMPAT_LAYER", out var layers);
+        startInfo.Environment["__COMPAT_LAYER"] = string.IsNullOrWhiteSpace(layers) ? "HighDpiAware" : $"{layers} HighDpiAware";
 
         var process = new Process { StartInfo = startInfo };
         var result = new FfmpegProcess(process);

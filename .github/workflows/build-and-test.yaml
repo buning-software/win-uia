@@ -84,6 +84,17 @@ jobs:
         with:
           name: build-output
 
+      # Screen recordings (WinUia.Recording) need ffmpeg; install it when the runner image lacks it.
+      - name: Ensure ffmpeg
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg --no-progress -y
+          }
+          $ffmpeg = (Get-Command ffmpeg).Source
+          Write-Host "ffmpeg: $ffmpeg"
+          "WINUIA_FFMPEG=$ffmpeg" >> $env:GITHUB_ENV
+
       - name: Integration test
         run: dotnet test --no-build --configuration Release --logger GitHubActions --filter "FullyQualifiedName~.IntegrationTests."
 

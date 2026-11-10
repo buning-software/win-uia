@@ -17,20 +17,15 @@ internal static class FfmpegLocator
         if (!string.IsNullOrWhiteSpace(explicitPath))
         {
             tried.Add($"FfmpegRecorder.FfmpegPath ({explicitPath})");
-            if (fileExists(explicitPath))
-            {
-                return explicitPath;
-            }
+            // An explicit choice is never replaced by another ffmpeg: a wrong path must show up, not be papered over.
+            return fileExists(explicitPath) ? explicitPath : null;
         }
 
         var fromEnvironment = getEnvironmentVariable(EnvironmentVariable);
         if (!string.IsNullOrWhiteSpace(fromEnvironment))
         {
             tried.Add($"{EnvironmentVariable} ({fromEnvironment})");
-            if (fileExists(fromEnvironment))
-            {
-                return fromEnvironment;
-            }
+            return fileExists(fromEnvironment) ? fromEnvironment : null;
         }
 
         tried.Add("PATH");
