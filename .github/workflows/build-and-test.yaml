@@ -131,14 +131,14 @@ jobs:
           WINUIA_RECORDING: ${{ inputs.record-all-tests && 'all' || 'failed' }}
           WINUIA_RECORDING_DIR: ${{ github.workspace }}/TestResults/Recordings
         run: >-
-          dotnet test --no-build --configuration Release --logger GitHubActions --logger trx
-          --results-directory TestResults --filter "FullyQualifiedName~.UiTests."
+          dotnet test --no-build --configuration Release --logger GitHubActions
+          --filter "FullyQualifiedName~.UiTests."
 
-      - name: Upload UI test results
+      - name: Upload UI test recordings
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ui-test-results
-          path: TestResults
+          name: ui-test-recordings
+          path: TestResults/Recordings
           if-no-files-found: ignore
           retention-days: 14
