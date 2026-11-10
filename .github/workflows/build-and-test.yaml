@@ -2,12 +2,6 @@ name: Build and test
 
 on:
   pull_request:
-  workflow_dispatch:
-    inputs:
-      record-all-tests:
-        description: Keep a screen recording of every UI test, not only failed ones
-        type: boolean
-        default: false
   workflow_call:
     inputs:
       record-all-tests:
