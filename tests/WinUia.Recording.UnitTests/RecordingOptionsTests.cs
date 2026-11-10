@@ -28,10 +28,11 @@ public class RecordingOptionsTests
             Directory.Delete(_directory, recursive: true);
     }
 
-    private RecordingOptions Options(FakeRecorder recorder, FakeFramework? framework, RecordingMode mode = RecordingMode.Failed) => new()
+    private RecordingOptions Options(FakeRecorder recorder, string? name, bool? failed, RecordingMode mode = RecordingMode.Failed) => new()
     {
         Recorder = recorder,
-        TestFramework = framework,
+        Name = name is null ? null : () => name,
+        Keep = failed is null ? null : () => failed.Value,
         Mode = mode,
         OutputDirectory = _directory,
         Area = new ScreenRect(0, 0, 100, 100),
@@ -50,7 +51,7 @@ public class RecordingOptionsTests
         {
             Assert.That(options.Recorder, Is.InstanceOf<FfmpegRecorder>());
             Assert.That(options.Mode, Is.EqualTo(RecordingMode.Failed));
-            Assert.That(options.TestFramework, Is.Null, "null means no test framework");
+            Assert.That((object?)options.Keep, Is.Null, "unset keeps every video");
         }
     }
 
@@ -59,9 +60,8 @@ public class RecordingOptionsTests
     {
         Environment.SetEnvironmentVariable("WINUIA_RECORDING", "off");
         var recorder = new FakeRecorder();
-        var framework = new FakeFramework { Name = "x" };
 
-        ((IAppRecorder)Options(recorder, framework)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "x", failed: null)).Start(Context).Dispose();
 
         Assert.That(recorder.Started, Is.Empty);
     }
@@ -71,7 +71,7 @@ public class RecordingOptionsTests
     {
         var recorder = new FakeRecorder { UnavailableReason = "not installed" };
 
-        Assert.DoesNotThrow(() => ((IAppRecorder)Options(recorder, framework: null)).Start(Context).Dispose());
+        Assert.DoesNotThrow(() => ((IAppRecorder)Options(recorder, name: null, failed: null)).Start(Context).Dispose());
         Assert.That(recorder.Started, Is.Empty);
     }
 
@@ -80,17 +80,34 @@ public class RecordingOptionsTests
     {
         var recorder = new FakeRecorder { FileExtension = ".avi" };
 
-        ((IAppRecorder)Options(recorder, new FakeFramework { Name = "Ns.MyTest", Failed = true })).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "Ns.MyTest", failed: true)).Start(Context).Dispose();
 
         Assert.That(recorder.Started, Is.EqualTo(new[] { (Path.Combine(_directory, "Ns.MyTest.avi"), (ScreenRect?)new ScreenRect(0, 0, 100, 100)) }));
     }
 
     [Test]
-    public void Without_a_test_framework_the_recording_is_named_after_the_app_and_the_time()
+    public void Without_a_name_the_recording_is_named_after_the_app_and_the_time()
     {
         var recorder = new FakeRecorder();
 
-        ((IAppRecorder)Options(recorder, framework: null)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, name: null, failed: null)).Start(Context).Dispose();
+
+        Assert.That(Path.GetFileName(recorder.Started.Single().Path), Does.Match(@"^Sample-\d{8}-\d{6}\.mp4$"));
+    }
+
+    [Test]
+    public void A_throwing_name_falls_back_to_the_app_name_and_still_records()
+    {
+        var recorder = new FakeRecorder();
+        var options = new RecordingOptions
+        {
+            Recorder = recorder,
+            Name = () => throw new InvalidOperationException("no test context"),
+            OutputDirectory = _directory,
+            Area = new ScreenRect(0, 0, 100, 100),
+        };
+
+        ((IAppRecorder)options).Start(Context).Dispose();
 
         Assert.That(Path.GetFileName(recorder.Started.Single().Path), Does.Match(@"^Sample-\d{8}-\d{6}\.mp4$"));
     }
@@ -99,30 +116,20 @@ public class RecordingOptionsTests
     public void A_passing_test_leaves_no_file_by_default()
     {
         var recorder = new FakeRecorder { WritesFile = true };
-        var framework = new FakeFramework { Name = "t", Failed = false };
 
-        ((IAppRecorder)Options(recorder, framework)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "t", failed: false)).Start(Context).Dispose();
 
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(Files(), Is.Empty);
-            Assert.That(framework.Attached, Is.Empty);
-        }
+        Assert.That(Files(), Is.Empty);
     }
 
     [Test]
-    public void A_failed_test_keeps_its_file_and_attaches_it()
+    public void A_failed_test_keeps_its_file()
     {
         var recorder = new FakeRecorder { WritesFile = true };
-        var framework = new FakeFramework { Name = "t", Failed = true };
 
-        ((IAppRecorder)Options(recorder, framework)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "t", failed: true)).Start(Context).Dispose();
 
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
-            Assert.That(framework.Attached, Is.EqualTo(new[] { Path.Combine(_directory, "t.mp4") }));
-        }
+        Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
     }
 
     [Test]
@@ -130,7 +137,7 @@ public class RecordingOptionsTests
     {
         var recorder = new FakeRecorder { WritesFile = true };
 
-        ((IAppRecorder)Options(recorder, new FakeFramework { Name = "t", Failed = false }, RecordingMode.All)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "t", failed: false, RecordingMode.All)).Start(Context).Dispose();
 
         Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
     }
@@ -141,7 +148,7 @@ public class RecordingOptionsTests
         Environment.SetEnvironmentVariable("WINUIA_RECORDING", "all");
         var recorder = new FakeRecorder { WritesFile = true };
 
-        ((IAppRecorder)Options(recorder, new FakeFramework { Name = "t", Failed = false }, RecordingMode.Failed)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "t", failed: false, RecordingMode.Failed)).Start(Context).Dispose();
 
         Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
     }

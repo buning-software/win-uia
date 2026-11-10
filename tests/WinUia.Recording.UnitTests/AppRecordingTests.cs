@@ -14,63 +14,76 @@ public class AppRecordingTests
     [TearDown]
     public void DeleteFile() => File.Delete(_file);
 
-    private AppRecording Create(RecordingMode mode, ITestFramework? framework) =>
-        new(new ScreenRecording(_file, new NoSession()), mode, framework);
+    private AppRecording Create(RecordingMode mode, Func<bool>? keep, Action<string>? onKept = null) =>
+        new(new ScreenRecording(_file, new NoSession()), mode, keep, onKept);
 
     [Test]
-    public void A_failed_test_keeps_its_recording_and_attaches_it()
+    public void A_kept_recording_is_reported_with_its_path()
     {
-        var framework = new FakeFramework { Failed = true };
+        string? kept = null;
 
-        Create(RecordingMode.Failed, framework).Dispose();
+        Create(RecordingMode.Failed, () => true, path => kept = path).Dispose();
 
-        Assert.That(File.Exists(_file), Is.True);
-        Assert.That(framework.Attached, Is.EqualTo(new[] { _file }));
+        Assert.That(kept, Is.EqualTo(_file));
     }
 
     [Test]
-    public void A_passing_test_deletes_its_recording_in_failed_mode_and_attaches_nothing()
+    public void A_deleted_recording_is_not_reported()
     {
-        var framework = new FakeFramework { Failed = false };
+        var reported = false;
 
-        Create(RecordingMode.Failed, framework).Dispose();
+        Create(RecordingMode.Failed, () => false, _ => reported = true).Dispose();
+
+        Assert.That(reported, Is.False);
+    }
+
+    [Test]
+    public void A_throwing_kept_callback_does_not_throw()
+    {
+        var recording = Create(RecordingMode.Failed, () => true, _ => throw new InvalidOperationException());
+
+        Assert.DoesNotThrow(recording.Dispose);
+    }
+
+    [Test]
+    public void A_failed_test_keeps_its_recording()
+    {
+        Create(RecordingMode.Failed, () => true).Dispose();
+
+        Assert.That(File.Exists(_file), Is.True);
+    }
+
+    [Test]
+    public void A_passing_test_deletes_its_recording_in_failed_mode()
+    {
+        Create(RecordingMode.Failed, () => false).Dispose();
 
         Assert.That(File.Exists(_file), Is.False);
-        Assert.That(framework.Attached, Is.Empty);
     }
 
     [Test]
-    public void Mode_all_keeps_a_passing_tests_recording_without_asking_and_attaches_it()
+    public void Mode_all_keeps_a_passing_tests_recording_without_asking()
     {
-        var framework = new FakeFramework { Failed = false };
+        var asked = false;
 
-        Create(RecordingMode.All, framework).Dispose();
+        Create(RecordingMode.All, () => { asked = true; return false; }).Dispose();
 
         Assert.That(File.Exists(_file), Is.True);
-        Assert.That(framework.Asked, Is.False);
-        Assert.That(framework.Attached, Is.EqualTo(new[] { _file }));
+        Assert.That(asked, Is.False);
     }
 
     [Test]
-    public void Without_a_test_framework_the_recording_is_kept()
+    public void Without_a_keep_decision_the_recording_is_kept()
     {
-        Create(RecordingMode.Failed, framework: null).Dispose();
+        Create(RecordingMode.Failed, keep: null).Dispose();
 
         Assert.That(File.Exists(_file), Is.True);
     }
 
     [Test]
-    public void When_the_outcome_is_unknown_the_recording_is_kept()
+    public void A_throwing_keep_decision_keeps_the_recording_without_throwing()
     {
-        Create(RecordingMode.Failed, new FakeFramework { Failed = null }).Dispose();
-
-        Assert.That(File.Exists(_file), Is.True);
-    }
-
-    [Test]
-    public void A_throwing_test_framework_keeps_the_recording_without_throwing()
-    {
-        var recording = Create(RecordingMode.Failed, new FakeFramework { Throw = true });
+        var recording = Create(RecordingMode.Failed, () => throw new InvalidOperationException());
 
         Assert.DoesNotThrow(recording.Dispose);
 

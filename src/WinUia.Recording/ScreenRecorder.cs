@@ -26,12 +26,11 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
 
         try
         {
-            var testFramework = options.TestFramework;
-            var name = testFramework?.CurrentTestName ?? DefaultName(context);
+            var name = ChooseName(context);
             var directory = options.OutputDirectory ?? getEnvironmentVariable(RecordingFile.DirectoryEnvironmentVariable);
             var path = RecordingFile.Choose(directory, name, recorder.FileExtension);
             var recording = ScreenRecording.Start(path, recorder, options.Area ?? ScreenArea.PrimaryMonitor());
-            return new AppRecording(recording, mode, testFramework);
+            return new AppRecording(recording, mode, options.Keep, options.OnKept);
         }
         catch (Exception exception) when (exception is not OutOfMemoryException)
         {
@@ -39,6 +38,22 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
             Warn($"this run is not recorded. {exception.Message}");
             return Nothing.Instance;
         }
+    }
+
+    // The name is cosmetic: a Name that throws or gives nothing must not cost the video.
+    private string ChooseName(AppRecordingContext context)
+    {
+        try
+        {
+            if (options.Name?.Invoke() is { Length: > 0 } name)
+                return name;
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            Warn($"could not name the video after the test, using the app name: {exception.Message}");
+        }
+
+        return DefaultName(context);
     }
 
     // Without a test, name the video after the app and the time, so several apps recorded in one run stay apart.

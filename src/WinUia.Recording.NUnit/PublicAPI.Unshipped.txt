@@ -1,6 +1,0 @@
-#nullable enable
-WinUia.Recording.NUnitTestFramework
-WinUia.Recording.NUnitTestFramework.Attach(string! path, string? description) -> void
-WinUia.Recording.NUnitTestFramework.CurrentTestFailed.get -> bool?
-WinUia.Recording.NUnitTestFramework.CurrentTestName.get -> string?
-WinUia.Recording.NUnitTestFramework.NUnitTestFramework() -> void

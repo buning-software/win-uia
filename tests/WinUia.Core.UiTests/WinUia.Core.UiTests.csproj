@@ -3,7 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinUia.Core\WinUia.Core.csproj" />
     <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
-    <ProjectReference Include="..\WinUia.Testing.Shared\WinUia.Testing.Shared.csproj" />
+    <ProjectReference Include="..\WinUia.Testing.Common\WinUia.Testing.Common.csproj" />
   </ItemGroup>
 
 </Project>

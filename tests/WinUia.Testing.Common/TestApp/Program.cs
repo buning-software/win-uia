@@ -1,4 +1,4 @@
-namespace WinUia.TestApp;
+namespace WinUia.Testing.Common.TestApp;
 
 internal static class Program
 {

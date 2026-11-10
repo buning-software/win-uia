@@ -1,5 +1,5 @@
 using WinUia.Models;
-using WinUia.Testing.Shared;
+using WinUia.Testing.Common;
 
 namespace WinUia.Recording.UiTests;
 
@@ -28,11 +28,12 @@ public class AppRecordingTests
 
     private IEnumerable<string> Videos() => Directory.Exists(_directory) ? Directory.GetFiles(_directory, "*.mp4") : [];
 
-    private RecordingOptions Options(bool? failed, RecordingMode mode = RecordingMode.Failed, FakeTestFramework? framework = null) => new()
+    private RecordingOptions Options(bool failed, RecordingMode mode = RecordingMode.Failed) => new()
     {
         OutputDirectory = _directory,
         Mode = mode,
-        TestFramework = framework ?? new FakeTestFramework { Name = "launch", Failed = failed },
+        Name = () => "launch",
+        Keep = () => failed,
     };
 
     private static void LaunchAndClose(RecordingOptions recording)
@@ -42,18 +43,15 @@ public class AppRecordingTests
     }
 
     [Test]
-    public void A_failed_test_keeps_a_playable_video_named_after_the_test_and_attaches_it()
+    public void A_failed_test_keeps_a_playable_video_named_after_the_test()
     {
-        var framework = new FakeTestFramework { Name = "launch", Failed = true };
-
-        LaunchAndClose(Options(failed: true, framework: framework));
+        LaunchAndClose(Options(failed: true));
 
         var video = Videos().Single();
         using (Assert.EnterMultipleScope())
         {
             Assert.That(Path.GetFileName(video), Is.EqualTo("launch.mp4"));
             Assert.That(new FileInfo(video).Length, Is.GreaterThan(0));
-            Assert.That(framework.Attached, Is.EqualTo(new[] { video }));
         }
     }
 
@@ -94,27 +92,12 @@ public class AppRecordingTests
     }
 
     [Test]
-    public void Without_a_TestFramework_the_video_is_kept_since_there_is_no_test_to_fail()
+    public void Without_a_Keep_decision_the_video_is_kept()
     {
         var options = new RecordingOptions { OutputDirectory = _directory };
 
         LaunchAndClose(options);
 
         Assert.That(Videos(), Has.Exactly(1).Items);
-    }
-
-    private sealed class FakeTestFramework : ITestFramework
-    {
-        public string? Name { get; init; }
-
-        public bool? Failed { get; init; }
-
-        public List<string> Attached { get; } = [];
-
-        public string? CurrentTestName => Name;
-
-        public bool? CurrentTestFailed => Failed;
-
-        public void Attach(string path, string? description) => Attached.Add(path);
     }
 }

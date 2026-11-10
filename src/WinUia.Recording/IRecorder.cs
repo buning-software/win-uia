@@ -1,5 +1,3 @@
-using WinUia.Models;
-
 namespace WinUia.Recording;
 
 /// <summary>

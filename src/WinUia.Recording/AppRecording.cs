@@ -1,6 +1,6 @@
 namespace WinUia.Recording;
 
-internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode, ITestFramework? testFramework) : IDisposable
+internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode, Func<bool>? keepVideo, Action<string>? onKept = null) : IDisposable
 {
     public void Dispose()
     {
@@ -8,11 +8,11 @@ internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode
         var keep = true;
         try
         {
-            keep = mode == RecordingMode.All || testFramework?.CurrentTestFailed != false;
+            keep = mode == RecordingMode.All || keepVideo?.Invoke() != false;
         }
         catch (Exception exception) when (exception is not OutOfMemoryException)
         {
-            Console.Error.WriteLine($"WinUia.Recording: could not determine the test outcome, keeping the video: {exception.Message}");
+            Console.Error.WriteLine($"WinUia.Recording: could not decide whether to keep the video, keeping it: {exception.Message}");
         }
 
         recording.Keep = keep;
@@ -26,16 +26,15 @@ internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode
             Console.Error.WriteLine($"WinUia.Recording: could not stop the recording {recording.OutputPath}: {exception.Message}");
         }
 
-        if (keep)
+        if (keep && onKept is not null && File.Exists(recording.OutputPath))
         {
             try
             {
-                testFramework?.Attach(recording.OutputPath, "Screen recording");
+                onKept(recording.OutputPath);
             }
             catch (Exception exception) when (exception is not OutOfMemoryException)
             {
-                // The video is on disk; a failing attachment must not replace the test's own result.
-                Console.Error.WriteLine($"WinUia.Recording: could not attach {recording.OutputPath}: {exception.Message}");
+                Console.Error.WriteLine($"WinUia.Recording: OnKept failed for {recording.OutputPath}: {exception.Message}");
             }
         }
     }

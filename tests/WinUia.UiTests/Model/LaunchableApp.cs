@@ -1,5 +1,5 @@
 using WinUia.Models;
-using WinUia.Testing.Shared;
+using WinUia.Testing.Common;
 
 namespace WinUia.UiTests.Model;
 

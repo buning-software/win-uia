@@ -32,11 +32,21 @@ using var app = App.Launch(path, new AppLaunchOptions { Recording = new Recordin
 That is all the test code needed. The recording starts when the app is launched, so the video shows it starting,
 and stops when the app is disposed, after the app has closed. Attaching to a running process is not recorded.
 
-With a test framework the video is named after the test, kept only when the test failed, and attached to the test result.
-For NUnit install `WinUia.Recording.NUnit` and pass it: `new RecordingOptions { TestFramework = new NUnitTestFramework() }`.
-Dispose the app in `[TearDown]`, because whether the test failed is asked then. A passing or skipped test leaves no file.
-The video is named `Class.Test` (with the test's parameters), and when the name is longer than 100 characters its end is kept.
-To keep every video, set `Mode = RecordingMode.All`.
+To name the video after the test and keep only the videos of failed tests, tell the recording how, with your test framework.
+For NUnit:
+
+```csharp
+Recording = new RecordingOptions
+{
+    Name = () => TestContext.CurrentContext.Test.FullName,
+    Keep = () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive,
+    OnKept = path => TestContext.AddTestAttachment(path),   // optional: attach the video to the test result
+}
+```
+
+`Keep` is asked when the app is disposed, so dispose the app in `[TearDown]`. A passing or skipped test then leaves no file.
+`OnKept` is called with the video's path once it is kept, so a video can be attached to the test result.
+When a name is longer than 100 characters its end is kept. To keep every video, set `Mode = RecordingMode.All`.
 
 ### Environment variables
 
@@ -58,7 +68,8 @@ On CI this is how to record everything without changing code: set `WINUIA_RECORD
 | `OutputDirectory` | see above | Where videos are written. |
 | `Area` | primary monitor | A `ScreenRect` in physical pixels. Use `ScreenArea.PrimaryMonitor()` or `ScreenArea.MonitorContaining(rect)` to pick a monitor. |
 | `Recorder` | `new FfmpegRecorder()` | How the screen is captured, see below. |
-| `TestFramework` | none | What is known about the running test, see below. |
+| `Name` | app and time | A `Func<string?>` that gives the video's file name, for example the running test's name. |
+| `Keep` | keep all | A `Func<bool>` asked when the app is disposed: true keeps the video, false deletes it. Ignored when `Mode` is `All`. |
 
 An app that opens on a monitor other than the primary one needs `Area`, since the window does not exist yet when recording starts.
 
@@ -82,13 +93,6 @@ Recording = new RecordingOptions { Recorder = new FfmpegRecorder { FrameRate = 3
 The capture method is a strategy: `IRecorder` has a `FileExtension`, an `UnavailableReason` (null when it can be used) and
 `Start(outputPath, area)`, which returns something to dispose to stop. To record another way, implement it and pass it as
 `Recorder`. Naming, keeping, the environment variables and the app lifecycle are unchanged.
-
-### Test frameworks
-
-How the package learns about the running test is a strategy too. `ITestFramework` gives the test's name, whether it has
-failed, and attaches a kept video to the result. For NUnit, install `WinUia.Recording.NUnit` and pass `new NUnitTestFramework()`.
-For another framework, implement `ITestFramework` and pass it as `TestFramework`. Without any test framework, every
-video is kept and named `<app>-<yyyyMMdd-HHmmss>`, for example `MyApp-20260101-120000.mp4`.
 
 ### Something other than a screen video
 

@@ -4,11 +4,23 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsUnitTestProject Condition="$(MSBuildProjectName.EndsWith('Tests'))">true</IsUnitTestProject>
+
+    <!-- NUnit unless the project name says otherwise: WinUia.TestFrameworks.XUnit.UiTests, WinUia.TestFrameworks.MsTest.UiTests. -->
+    <TestFramework>NUnit</TestFramework>
+    <TestFramework Condition="$(MSBuildProjectName.Contains('.XUnit.'))">XUnit</TestFramework>
+    <TestFramework Condition="$(MSBuildProjectName.Contains('.MsTest.'))">MsTest</TestFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsUnitTestProject)' == 'true' and '$(TestFramework)' == 'xunit'">
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsUnitTestProject)' == 'true'">
     <PackageReference Include="GitHubActionsTestLogger" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsUnitTestProject)' == 'true' and '$(TestFramework)' == 'nunit'">
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="NUnit.Analyzers" PrivateAssets="all" />
@@ -22,7 +34,26 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.UiTests'))">
+  <!-- xUnit v3 runs tests on thread-pool threads (MTA); parallelism is switched off in xunit.runner.json. -->
+  <ItemGroup Condition="'$(IsUnitTestProject)' == 'true' and '$(TestFramework)' == 'xunit'">
+    <!-- The mtp-off flavour runs under VSTest: .NET 10 refuses VSTest for the Microsoft.Testing.Platform flavour. -->
+    <PackageReference Include="xunit.v3.mtp-off" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+
+    <Using Include="Xunit" />
+
+    <Content Include="$(MSBuildThisFileDirectory)xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- MSTest runs tests on MTA threads, one at a time unless the assembly asks for parallelism. -->
+  <ItemGroup Condition="'$(IsUnitTestProject)' == 'true' and '$(TestFramework)' == 'mstest'">
+    <PackageReference Include="MSTest" />
+
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <!-- NUnit UI test projects share one lock setup; the xUnit and MSTest projects set it up in their own framework. -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.UiTests')) and '$(TestFramework)' == 'NUnit'">
     <!-- One desktop: the lock is held for the whole test run of the assembly, across test processes. -->
     <Compile Include="$(MSBuildThisFileDirectory)DesktopLockSetUp.cs" Link="DesktopLockSetUp.cs" />
   </ItemGroup>

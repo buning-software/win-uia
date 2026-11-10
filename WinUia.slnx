@@ -1,7 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/WinUia.Recording/WinUia.Recording.csproj" />
-    <Project Path="src/WinUia.Recording.NUnit/WinUia.Recording.NUnit.csproj" />
     <Project Path="src/WinUia/WinUia.csproj" />
     <Project Path="src/WinUia.Core/WinUia.Core.csproj" />
   </Folder>
@@ -9,15 +8,17 @@
     <Project Path="tests/WinUia.Recording.UnitTests/WinUia.Recording.UnitTests.csproj" />
     <Project Path="tests/WinUia.Recording.IntegrationTests/WinUia.Recording.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.Recording.UiTests/WinUia.Recording.UiTests.csproj" />
-    <Project Path="tests/WinUia.Recording.NUnit.UnitTests/WinUia.Recording.NUnit.UnitTests.csproj" />
     <Project Path="tests/WinUia.UnitTests/WinUia.UnitTests.csproj" />
     <Project Path="tests/WinUia.IntegrationTests/WinUia.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.UiTests/WinUia.UiTests.csproj" />
     <Project Path="tests/WinUia.Core.UnitTests/WinUia.Core.UnitTests.csproj" />
     <Project Path="tests/WinUia.Core.IntegrationTests/WinUia.Core.IntegrationTests.csproj" />
     <Project Path="tests/WinUia.Core.UiTests/WinUia.Core.UiTests.csproj" />
-    <Project Path="tests/WinUia.TestApp/WinUia.TestApp.csproj" />
-    <Project Path="tests/WinUia.Testing.Shared/WinUia.Testing.Shared.csproj" />
+    <Project Path="tests/WinUia.TestFrameworks.Common/WinUia.TestFrameworks.Common.csproj" />
+    <Project Path="tests/WinUia.TestFrameworks.NUnit.UiTests/WinUia.TestFrameworks.NUnit.UiTests.csproj" />
+    <Project Path="tests/WinUia.TestFrameworks.XUnit.UiTests/WinUia.TestFrameworks.XUnit.UiTests.csproj" />
+    <Project Path="tests/WinUia.TestFrameworks.MsTest.UiTests/WinUia.TestFrameworks.MsTest.UiTests.csproj" />
+    <Project Path="tests/WinUia.Testing.Common/WinUia.Testing.Common.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/WinUia.Examples.Winforms.UiTests/WinUia.Examples.Winforms.UiTests.csproj" />

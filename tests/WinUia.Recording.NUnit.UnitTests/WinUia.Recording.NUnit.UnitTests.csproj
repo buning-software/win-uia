@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\WinUia.Recording.NUnit\WinUia.Recording.NUnit.csproj" />
-  </ItemGroup>
-
-</Project>

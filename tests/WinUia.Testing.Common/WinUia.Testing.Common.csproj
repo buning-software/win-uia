@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The shared test code (AppPaths) and the empty window the UI tests launch (TestApp/), built as one executable. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>AppPath.TestApp</_Parameter1>
+      <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)\WinUia.Testing.Common.exe'))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
