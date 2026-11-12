@@ -59,7 +59,7 @@ WinUia is a .NET library for inspecting and automating Windows applications thro
 
 ### Built With
 
-* [.NET 10](https://dotnet.microsoft.com/)
+* [.NET 11](https://dotnet.microsoft.com/)
 * [Microsoft UI Automation](https://learn.microsoft.com/windows/win32/winauto/entry-uiauto-win32)
 
 ### Features
@@ -72,7 +72,7 @@ WinUia is a .NET library for inspecting and automating Windows applications thro
 
 ## Getting Started
 
-WinUia needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Windows 10 or 11; tests that drive an app need an interactive, unlocked desktop. Use Visual Studio 2022 or later, or any editor with the `dotnet` CLI. The Windows SDK is not required.
+WinUia needs the [.NET 11 SDK](https://dotnet.microsoft.com/download) and Windows 10 or 11; tests that drive an app need an interactive, unlocked desktop. Use Visual Studio 2022 or later, or any editor with the `dotnet` CLI. The Windows SDK is not required.
 
 ### Installation
 

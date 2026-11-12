@@ -45,7 +45,10 @@ public sealed class AppRecordingTests
     {
         public static FakeRecorder Recorder { get; set; } = new();
 
+        // A new instance per launch is intended: the options are per-launch values, not shared state.
+        #pragma warning disable WFO2000
         protected override AppLaunchOptions DefaultOptions => new() { Recording = Recorder };
+        #pragma warning restore WFO2000
     }
 
     [Test]
