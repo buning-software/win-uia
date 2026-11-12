@@ -6,13 +6,16 @@ internal static class RecordingFile
 
     public const string DirectoryEnvironmentVariable = "WINUIA_RECORDING_DIR";
 
-    // Directory: option, then WINUIA_RECORDING_DIR, then TestResults/Recordings. Numbered so a second launch in the same test does not overwrite the first.
-    public static string Choose(string? directory, string? name, string extension, Func<string, bool>? exists = null)
+    // Directory: option, then WINUIA_RECORDING_DIR, then TestResults/Recordings.
+    public static string ResolveFolder(string? directory, string? fromEnvironment) =>
+        !string.IsNullOrWhiteSpace(directory) ? directory
+        : !string.IsNullOrEmpty(fromEnvironment) ? fromEnvironment
+        : Path.Combine("TestResults", "Recordings");
+
+    // Numbered so a second launch in the same test does not overwrite the first.
+    public static string Choose(string folder, string? name, string extension, Func<string, bool>? exists = null)
     {
         exists ??= File.Exists;
-        var folder = !string.IsNullOrWhiteSpace(directory) ? directory
-            : Environment.GetEnvironmentVariable(DirectoryEnvironmentVariable) is { Length: > 0 } fromEnvironment ? fromEnvironment
-            : Path.Combine("TestResults", "Recordings");
 
         var baseName = Sanitize(string.IsNullOrWhiteSpace(name) ? DateTime.Now.ToString("yyyyMMdd-HHmmss") : name);
         var path = Path.Combine(folder, baseName + extension);

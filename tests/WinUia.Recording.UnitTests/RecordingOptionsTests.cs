@@ -96,6 +96,17 @@ public class RecordingOptionsTests
     }
 
     [Test]
+    public void A_packaged_app_is_named_after_its_package_not_the_text_after_the_last_dot()
+    {
+        var recorder = new FakeRecorder();
+        var packaged = new AppRecordingContext("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App", new AppLaunchOptions());
+
+        ((IAppRecorder)Options(recorder, name: null, failed: null)).Start(packaged).Dispose();
+
+        Assert.That(Path.GetFileName(recorder.Started.Single().Path), Does.Match(@"^Microsoft\.WindowsCalculator_8wekyb3d8bbwe-\d{8}-\d{6}\.mp4$"));
+    }
+
+    [Test]
     public void A_throwing_name_falls_back_to_the_app_name_and_still_records()
     {
         var recorder = new FakeRecorder();

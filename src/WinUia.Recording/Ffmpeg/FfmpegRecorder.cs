@@ -21,21 +21,8 @@ public sealed class FfmpegRecorder : IRecorder
     public string FileExtension => ".mp4";
 
     /// <inheritdoc />
-    public string? UnavailableReason
-    {
-        get
-        {
-            try
-            {
-                FfmpegLocator.Locate(FfmpegPath);
-                return null;
-            }
-            catch (ScreenRecordingException exception)
-            {
-                return exception.Message;
-            }
-        }
-    }
+    public string? UnavailableReason =>
+        FfmpegLocator.TryLocate(FfmpegPath, out var searched) is null ? FfmpegLocator.NotFoundMessage(searched) : null;
 
     /// <inheritdoc />
     public IDisposable Start(string outputPath, ScreenRect? area)

@@ -31,8 +31,8 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
             }
 
             var name = ChooseName(context);
-            var directory = options.OutputDirectory ?? getEnvironmentVariable(RecordingFile.DirectoryEnvironmentVariable);
-            var path = RecordingFile.Choose(directory, name, recorder.FileExtension);
+            var folder = RecordingFile.ResolveFolder(options.OutputDirectory, getEnvironmentVariable(RecordingFile.DirectoryEnvironmentVariable));
+            var path = RecordingFile.Choose(folder, name, recorder.FileExtension);
             var recording = ScreenRecording.Start(path, recorder, options.Area ?? ScreenArea.PrimaryMonitor());
             return new AppRecording(recording, mode, options.Keep, options.OnKept);
         }
@@ -60,10 +60,16 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
         return DefaultName(context);
     }
 
+    private static readonly char[] PathSeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
+
     // Without a test, name the video after the app and the time, so several apps recorded in one run stay apart.
     private static string DefaultName(AppRecordingContext context)
     {
-        var app = Path.GetFileNameWithoutExtension(context.Target);
+        // A packaged app's target is an AppUserModelID (PackageFamilyName!AppId): the dot in the name is not an extension.
+        var target = context.Target;
+        var app = target.Contains('!') && target.IndexOfAny(PathSeparators) < 0
+            ? target[..target.IndexOf('!')]
+            : Path.GetFileNameWithoutExtension(target);
         var time = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         return string.IsNullOrWhiteSpace(app) ? time : $"{app}-{time}";
     }

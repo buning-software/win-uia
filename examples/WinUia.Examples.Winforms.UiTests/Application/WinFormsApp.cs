@@ -13,6 +13,8 @@ public sealed class WinFormsApp : App
     protected override AppLaunchOptions DefaultOptions => new()
     {
         ShowPointer = true,
+        // Other UI test assemblies may hold the desktop for their whole run.
+        DesktopTimeout = TimeSpan.FromMinutes(60),
         Recording = new RecordingOptions
         {
             Name = () => TestContext.CurrentContext.Test.FullName,

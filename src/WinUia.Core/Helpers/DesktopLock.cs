@@ -31,9 +31,17 @@ public sealed class DesktopLock : IDisposable
     /// </summary>
     /// <param name="timeout">How long to wait for another holder to give the desktop back. Default 5 minutes.</param>
     /// <exception cref="TimeoutException">Another holder kept the desktop for longer than <paramref name="timeout"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> is negative and not infinite.</exception>
     public static DesktopLock Acquire(TimeSpan? timeout = null)
     {
         var wait = timeout ?? TimeSpan.FromMinutes(5);
+        if (wait != InfiniteTimeSpan && wait < TimeSpan.Zero)
+            throw new ArgumentOutOfRangeException(nameof(timeout), timeout, "The timeout cannot be negative. Use Timeout.InfiniteTimeSpan to wait forever.");
+
+        // A lock and a mutex wait at most int.MaxValue milliseconds (about 24 days); anything longer means "forever".
+        if (wait.TotalMilliseconds > int.MaxValue)
+            wait = InfiniteTimeSpan;
+
         var infinite = wait == InfiniteTimeSpan;
         var started = Stopwatch.GetTimestamp();
 

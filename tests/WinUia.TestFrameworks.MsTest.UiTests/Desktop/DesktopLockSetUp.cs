@@ -9,7 +9,7 @@ public static class DesktopLockSetUp
     [AssemblyInitialize]
     public static void TakeDesktop(TestContext context)
     {
-        s_desktop = DesktopLock.Acquire();
+        s_desktop = DesktopLock.Acquire(TimeSpan.FromMinutes(60));
     }
 
     [AssemblyCleanup]

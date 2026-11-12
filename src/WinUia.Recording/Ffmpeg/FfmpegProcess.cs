@@ -74,6 +74,7 @@ internal sealed class FfmpegProcess : IDisposable
             throw new ScreenRecordingException($"Failed to start ffmpeg at '{ffmpegPath}': {exception.Message}", exception);
         }
 
+        KillOnCloseJob.TryAssign(process);
         process.BeginErrorReadLine();
 
         // Bad arguments or an unusable desktop make ffmpeg exit at once; otherwise it says when it is ready.

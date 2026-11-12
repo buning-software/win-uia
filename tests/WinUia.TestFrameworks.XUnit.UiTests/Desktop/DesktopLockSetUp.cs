@@ -8,7 +8,7 @@ namespace WinUia.TestFrameworks.XUnit.UiTests.Desktop;
 
 public sealed class DesktopLockSetUp : IDisposable
 {
-    private readonly DesktopLock _desktop = DesktopLock.Acquire();
+    private readonly DesktopLock _desktop = DesktopLock.Acquire(TimeSpan.FromMinutes(60));
 
     public void Dispose()
     {

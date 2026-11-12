@@ -42,14 +42,13 @@ internal static class FfmpegLocator
         return null;
     }
 
-    public static string? TryLocate(string? explicitPath) =>
-        TryLocate(explicitPath, Environment.GetEnvironmentVariable, File.Exists, out _);
+    public static string? TryLocate(string? explicitPath, out IReadOnlyList<string> searched) =>
+        TryLocate(explicitPath, Environment.GetEnvironmentVariable, File.Exists, out searched);
 
-    public static string Locate(string? explicitPath)
-    {
-        var found = TryLocate(explicitPath, Environment.GetEnvironmentVariable, File.Exists, out var searched);
-        return found ?? throw new ScreenRecordingException(
-            $"ffmpeg was not found. Searched: {string.Join(", ", searched)}. " +
-            $"Install ffmpeg and add it to PATH, set {EnvironmentVariable}, or set FfmpegRecorder.FfmpegPath.");
-    }
+    public static string NotFoundMessage(IReadOnlyList<string> searched) =>
+        $"ffmpeg was not found. Searched: {string.Join(", ", searched)}. " +
+        $"Install ffmpeg and add it to PATH, set {EnvironmentVariable}, or set FfmpegRecorder.FfmpegPath.";
+
+    public static string Locate(string? explicitPath) =>
+        TryLocate(explicitPath, out var searched) ?? throw new ScreenRecordingException(NotFoundMessage(searched));
 }
