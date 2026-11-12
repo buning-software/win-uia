@@ -1,4 +1,4 @@
-using WinUia.Testing.Shared;
+using WinUia.Testing.Common;
 
 namespace WinUia.Core.UiTests.Model;
 

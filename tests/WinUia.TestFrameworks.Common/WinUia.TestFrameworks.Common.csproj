@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WinUia\WinUia.csproj" />
+    <ProjectReference Include="..\..\src\WinUia.Recording\WinUia.Recording.csproj" />
+    <ProjectReference Include="..\..\examples\WinUia.Examples.Winforms\WinUia.Examples.Winforms.csproj" ReferenceOutputAssembly="false" />
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>ApplicationPath</_Parameter1>
+      <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\examples\WinUia.Examples.Winforms\bin\$(Configuration)\$(TargetFramework)\WinUia.Examples.Winforms.exe'))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

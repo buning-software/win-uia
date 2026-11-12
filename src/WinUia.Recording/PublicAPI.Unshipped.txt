@@ -1,0 +1,48 @@
+#nullable enable
+WinUia.Recording.FfmpegRecorder
+WinUia.Recording.FfmpegRecorder.DrawMouse.get -> bool
+WinUia.Recording.FfmpegRecorder.DrawMouse.set -> void
+WinUia.Recording.FfmpegRecorder.FfmpegPath.get -> string?
+WinUia.Recording.FfmpegRecorder.FfmpegPath.set -> void
+WinUia.Recording.FfmpegRecorder.FfmpegRecorder() -> void
+WinUia.Recording.FfmpegRecorder.FileExtension.get -> string!
+WinUia.Recording.FfmpegRecorder.FrameRate.get -> int
+WinUia.Recording.FfmpegRecorder.FrameRate.set -> void
+WinUia.Recording.FfmpegRecorder.Start(string! outputPath, WinUia.ScreenRect? area) -> System.IDisposable!
+WinUia.Recording.FfmpegRecorder.UnavailableReason.get -> string?
+WinUia.Recording.IRecorder
+WinUia.Recording.IRecorder.FileExtension.get -> string!
+WinUia.Recording.IRecorder.Start(string! outputPath, WinUia.ScreenRect? area) -> System.IDisposable!
+WinUia.Recording.IRecorder.UnavailableReason.get -> string?
+WinUia.Recording.RecordingMode
+WinUia.Recording.RecordingMode.All = 1 -> WinUia.Recording.RecordingMode
+WinUia.Recording.RecordingMode.Failed = 0 -> WinUia.Recording.RecordingMode
+WinUia.Recording.RecordingMode.Off = 2 -> WinUia.Recording.RecordingMode
+WinUia.Recording.RecordingOptions
+WinUia.Recording.RecordingOptions.Area.get -> WinUia.ScreenRect?
+WinUia.Recording.RecordingOptions.Area.init -> void
+WinUia.Recording.RecordingOptions.Keep.get -> System.Func<bool>?
+WinUia.Recording.RecordingOptions.Keep.init -> void
+WinUia.Recording.RecordingOptions.OnKept.get -> System.Action<string!>?
+WinUia.Recording.RecordingOptions.OnKept.init -> void
+WinUia.Recording.RecordingOptions.Name.get -> System.Func<string?>?
+WinUia.Recording.RecordingOptions.Name.init -> void
+WinUia.Recording.RecordingOptions.Mode.get -> WinUia.Recording.RecordingMode
+WinUia.Recording.RecordingOptions.Mode.init -> void
+WinUia.Recording.RecordingOptions.OutputDirectory.get -> string?
+WinUia.Recording.RecordingOptions.OutputDirectory.init -> void
+WinUia.Recording.RecordingOptions.Recorder.get -> WinUia.Recording.IRecorder!
+WinUia.Recording.RecordingOptions.Recorder.init -> void
+WinUia.Recording.RecordingOptions.RecordingOptions() -> void
+WinUia.Recording.ScreenArea
+WinUia.Recording.ScreenRecording
+WinUia.Recording.ScreenRecording.Dispose() -> void
+WinUia.Recording.ScreenRecording.Keep.get -> bool
+WinUia.Recording.ScreenRecording.Keep.set -> void
+WinUia.Recording.ScreenRecording.OutputPath.get -> string!
+WinUia.Recording.ScreenRecordingException
+WinUia.Recording.ScreenRecordingException.ScreenRecordingException(string! message) -> void
+WinUia.Recording.ScreenRecordingException.ScreenRecordingException(string! message, System.Exception! innerException) -> void
+static WinUia.Recording.ScreenArea.PrimaryMonitor() -> WinUia.ScreenRect
+static WinUia.Recording.ScreenArea.MonitorContaining(WinUia.ScreenRect rect) -> WinUia.ScreenRect
+static WinUia.Recording.ScreenRecording.Start(string! outputPath, WinUia.Recording.IRecorder? recorder = null, WinUia.ScreenRect? area = null) -> WinUia.Recording.ScreenRecording!

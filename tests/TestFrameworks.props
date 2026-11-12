@@ -1,0 +1,8 @@
+<Project>
+  <!-- Shared by the WinUia.TestFrameworks.NUnit/XUnit/MsTest.UiTests projects: the same checks run under each test framework against the WinForms example app. -->
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\WinUia\WinUia.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\WinUia.Recording\WinUia.Recording.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)WinUia.TestFrameworks.Common\WinUia.TestFrameworks.Common.csproj" />
+  </ItemGroup>
+</Project>

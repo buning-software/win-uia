@@ -1,4 +1,3 @@
-using WinUia.Examples.Winforms.UiTests.Application;
 using WinUia.Examples.Winforms.UiTests.Fixtures;
 
 namespace WinUia.Examples.Winforms.UiTests.Tests;

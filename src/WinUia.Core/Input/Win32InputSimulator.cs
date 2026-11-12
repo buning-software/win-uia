@@ -120,8 +120,7 @@ public sealed class Win32InputSimulator : IInputSimulator
     }
 
     /// <summary>
-    /// Presses the keys in order and releases them in reverse order: one key (<c>SendKeys(VirtualKey.Enter)</c>) or
-    /// a combination (<c>SendKeys(VirtualKey.Control, VirtualKey.A)</c>).
+    /// Presses the keys in order and releases them in reverse order: a single key or a combination such as Control+A.
     /// </summary>
     public void SendKeys(params VirtualKey[] keys)
     {

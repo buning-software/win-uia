@@ -24,6 +24,23 @@ public class DesktopLockTests
     }
 
     [Test]
+    public void Acquire_rejects_a_negative_timeout()
+    {
+        Assert.That(() => DesktopLock.Acquire(TimeSpan.FromSeconds(-1)), Throws.TypeOf<ArgumentOutOfRangeException>());
+    }
+
+    [Test]
+    public void Acquire_accepts_an_infinite_or_huge_timeout_when_the_desktop_is_free()
+    {
+        using (DesktopLock.Acquire(Timeout.InfiniteTimeSpan))
+        {
+        }
+
+        using var huge = DesktopLock.Acquire(TimeSpan.FromDays(30));
+        Assert.That(huge, Is.Not.Null);
+    }
+
+    [Test]
     public void Acquire_times_out_while_another_process_keeps_the_desktop()
     {
         // Another process holds the named mutex; a thread stands in for it.

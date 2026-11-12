@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace WinUia.Testing.Shared;
+namespace WinUia.Testing.Common;
 
 public static class AppPaths
 {
