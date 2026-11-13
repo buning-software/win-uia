@@ -7,44 +7,44 @@ public sealed class RecordingTests : IDisposable
 {
     private readonly RecordingScenario _recording = new(
         name: () => TestContext.Current.Test?.TestDisplayName,
-        keep: () => TestContext.Current.TestState?.Result is not (TestResult.Passed or TestResult.Skipped));
+        failed: () => TestContext.Current.TestState?.Result is not (TestResult.Passed or TestResult.Skipped));
 
     private App? _app;
-    private bool _expectNoVideo;
+    private bool _expectNoFailedVideo;
 
     public void Dispose()
     {
-        // The outcome of a test is known in Dispose, which is where the video is kept or deleted.
+        // The outcome of a test is known in Dispose, which is where the failed video is copied.
         _app?.Dispose();
-        var videos = _recording.Videos();
+        var failedVideos = _recording.FailedVideos();
         _recording.Dispose();
 
-        if (!_expectNoVideo)
+        if (!_expectNoFailedVideo)
             return;
 
         var result = TestContext.Current.TestState?.Result;
         Assert.True(result is not null, "xUnit did not report the outcome of the test in Dispose");
         if (result == TestResult.Passed)
-            Assert.Empty(videos);
+            Assert.Empty(failedVideos);
     }
 
     [Fact]
-    public void The_video_is_named_after_the_test_and_a_passing_test_leaves_none()
+    public void The_video_is_named_after_the_test_and_a_passing_test_leaves_no_failed_video()
     {
         Assert.True(_recording.UnavailableReason is null, RecordingScenario.FfmpegRequired);
-        _expectNoVideo = true;
+        _expectNoFailedVideo = true;
 
-        _app = App.Launch(ExampleApp.Path, _recording.Options(RecordingMode.Failed));
+        _app = App.Launch(ExampleApp.Path, _recording.Options());
 
-        Assert.Contains(nameof(The_video_is_named_after_the_test_and_a_passing_test_leaves_none), Path.GetFileName(Assert.Single(_recording.Videos())));
+        Assert.Contains(nameof(The_video_is_named_after_the_test_and_a_passing_test_leaves_no_failed_video), Path.GetFileName(Assert.Single(_recording.Videos())));
     }
 
     [Fact]
-    public void Mode_all_keeps_a_video_with_content()
+    public void A_video_has_content()
     {
         Assert.True(_recording.UnavailableReason is null, RecordingScenario.FfmpegRequired);
 
-        var app = App.Launch(ExampleApp.Path, _recording.Options(RecordingMode.All));
+        var app = App.Launch(ExampleApp.Path, _recording.Options());
         app.Dispose();
 
         Assert.True(new FileInfo(Assert.Single(_recording.Videos())).Length > 0);

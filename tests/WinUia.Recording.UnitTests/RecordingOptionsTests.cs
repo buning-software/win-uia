@@ -5,65 +5,49 @@ namespace WinUia.Recording.UnitTests;
 [NonParallelizable]
 public class RecordingOptionsTests
 {
-    private string? _previousMode;
-    private string? _previousDirectory;
     private string _directory = null!;
+    private string AllDirectory => Path.Combine(_directory, "All");
+    private string FailedDirectory => Path.Combine(_directory, "Failed");
 
     [SetUp]
     public void Prepare()
     {
-        _previousMode = Environment.GetEnvironmentVariable("WINUIA_RECORDING");
-        _previousDirectory = Environment.GetEnvironmentVariable("WINUIA_RECORDING_DIR");
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING", null);
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING_DIR", null);
         _directory = Path.Combine(Path.GetTempPath(), $"winuia-{Guid.NewGuid():N}");
     }
 
     [TearDown]
     public void Restore()
     {
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING", _previousMode);
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING_DIR", _previousDirectory);
         if (Directory.Exists(_directory))
             Directory.Delete(_directory, recursive: true);
     }
 
-    private RecordingOptions Options(FakeRecorder recorder, string? name, bool? failed, RecordingMode mode = RecordingMode.Failed) => new()
+    private RecordingOptions Options(FakeRecorder recorder, string? name, bool? failed) => new()
     {
         Recorder = recorder,
-        Name = name is null ? null : () => name,
-        Keep = failed is null ? null : () => failed.Value,
-        Mode = mode,
-        OutputDirectory = _directory,
+        FileName = name is null ? null : () => name,
+        Failed = failed is null ? null : () => failed.Value,
+        AllDirectory = AllDirectory,
+        FailedDirectory = FailedDirectory,
         Area = new ScreenRect(0, 0, 100, 100),
     };
 
     private static readonly AppRecordingContext Context = new("Sample.exe", new AppLaunchOptions());
 
-    private string[] Files() => Directory.Exists(_directory) ? Directory.GetFiles(_directory).Select(file => Path.GetFileName(file)!).ToArray() : [];
+    private static string[] Files(string directory) => Directory.Exists(directory) ? Directory.GetFiles(directory).Select(file => Path.GetFileName(file)!).ToArray() : [];
 
     [Test]
-    public void The_defaults_are_ffmpeg_and_keeping_failed_tests()
+    public void The_defaults_are_ffmpeg_and_no_failure_signal()
     {
         var options = new RecordingOptions();
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(options.Recorder, Is.InstanceOf<FfmpegRecorder>());
-            Assert.That(options.Mode, Is.EqualTo(RecordingMode.Failed));
-            Assert.That((object?)options.Keep, Is.Null, "unset keeps every video");
+            Assert.That((object?)options.Failed, Is.Null);
+            Assert.That(options.AllDirectory, Is.Null);
+            Assert.That(options.FailedDirectory, Is.Null);
         }
-    }
-
-    [Test]
-    public void Mode_off_starts_nothing()
-    {
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING", "off");
-        var recorder = new FakeRecorder();
-
-        ((IAppRecorder)Options(recorder, "x", failed: null)).Start(Context).Dispose();
-
-        Assert.That(recorder.Started, Is.Empty);
     }
 
     [Test]
@@ -82,7 +66,7 @@ public class RecordingOptionsTests
 
         ((IAppRecorder)Options(recorder, "Ns.MyTest", failed: true)).Start(Context).Dispose();
 
-        Assert.That(recorder.Started, Is.EqualTo(new[] { (Path.Combine(_directory, "Ns.MyTest.avi"), (ScreenRect?)new ScreenRect(0, 0, 100, 100)) }));
+        Assert.That(recorder.Started, Is.EqualTo(new[] { (Path.Combine(AllDirectory, "Ns.MyTest.avi"), (ScreenRect?)new ScreenRect(0, 0, 100, 100)) }));
     }
 
     [Test]
@@ -113,8 +97,9 @@ public class RecordingOptionsTests
         var options = new RecordingOptions
         {
             Recorder = recorder,
-            Name = () => throw new InvalidOperationException("no test context"),
-            OutputDirectory = _directory,
+            FileName = () => throw new InvalidOperationException("no test context"),
+            AllDirectory = AllDirectory,
+            FailedDirectory = FailedDirectory,
             Area = new ScreenRect(0, 0, 100, 100),
         };
 
@@ -124,44 +109,36 @@ public class RecordingOptionsTests
     }
 
     [Test]
-    public void A_passing_test_leaves_no_file_by_default()
+    public void A_passing_test_leaves_its_file_in_the_all_directory_only()
     {
         var recorder = new FakeRecorder { WritesFile = true };
 
         ((IAppRecorder)Options(recorder, "t", failed: false)).Start(Context).Dispose();
 
-        Assert.That(Files(), Is.Empty);
+        Assert.That(Files(AllDirectory), Is.EqualTo(new[] { "t.mp4" }));
+        Assert.That(Files(FailedDirectory), Is.Empty);
     }
 
     [Test]
-    public void A_failed_test_keeps_its_file()
+    public void A_failed_test_also_gets_a_copy_in_the_failed_directory()
     {
         var recorder = new FakeRecorder { WritesFile = true };
 
         ((IAppRecorder)Options(recorder, "t", failed: true)).Start(Context).Dispose();
 
-        Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
+        Assert.That(Files(AllDirectory), Is.EqualTo(new[] { "t.mp4" }));
+        Assert.That(Files(FailedDirectory), Is.EqualTo(new[] { "t.mp4" }));
     }
 
     [Test]
-    public void Keep_all_keeps_a_passing_tests_file()
+    public void Without_a_failure_signal_nothing_is_copied()
     {
         var recorder = new FakeRecorder { WritesFile = true };
 
-        ((IAppRecorder)Options(recorder, "t", failed: false, RecordingMode.All)).Start(Context).Dispose();
+        ((IAppRecorder)Options(recorder, "t", failed: null)).Start(Context).Dispose();
 
-        Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
-    }
-
-    [Test]
-    public void The_environment_overrides_Keep()
-    {
-        Environment.SetEnvironmentVariable("WINUIA_RECORDING", "all");
-        var recorder = new FakeRecorder { WritesFile = true };
-
-        ((IAppRecorder)Options(recorder, "t", failed: false, RecordingMode.Failed)).Start(Context).Dispose();
-
-        Assert.That(Files(), Is.EqualTo(new[] { "t.mp4" }));
+        Assert.That(Files(AllDirectory), Is.EqualTo(new[] { "t.mp4" }));
+        Assert.That(Files(FailedDirectory), Is.Empty);
     }
 
     [Test]

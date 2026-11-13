@@ -8,14 +8,14 @@ public sealed class RecordingTests
 {
     private RecordingScenario _recording = null!;
     private App? _app;
-    private bool _expectNoVideo;
+    private bool _expectNoFailedVideo;
 
     [SetUp]
     public void Prepare()
     {
         _recording = new RecordingScenario(
             name: () => TestContext.CurrentContext.Test.Name,
-            keep: () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive);
+            failed: () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive);
 
         Assert.That(_recording.UnavailableReason, Is.Null, RecordingScenario.FfmpegRequired);
     }
@@ -23,33 +23,33 @@ public sealed class RecordingTests
     [TearDown]
     public void Clean()
     {
-        // The outcome of a test is known in teardown, which is where the video is kept or deleted.
+        // The outcome of a test is known in teardown, which is where the failed video is copied.
         _app?.Dispose();
-        var videos = _recording.Videos();
+        var failedVideos = _recording.FailedVideos();
         _recording.Dispose();
 
-        if (!_expectNoVideo)
+        if (!_expectNoFailedVideo)
             return;
 
         Assert.That(TestContext.CurrentContext.Result.Outcome.Status, Is.Not.EqualTo(TestStatus.Inconclusive), "NUnit did not report the outcome of the test in teardown");
         if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Passed)
-            Assert.That(videos, Is.Empty, "a passing test should leave no video");
+            Assert.That(failedVideos, Is.Empty, "a passing test should leave no failed video");
     }
 
     [Test]
-    public void The_video_is_named_after_the_test_and_a_passing_test_leaves_none()
+    public void The_video_is_named_after_the_test_and_a_passing_test_leaves_no_failed_video()
     {
-        _expectNoVideo = true;
+        _expectNoFailedVideo = true;
 
-        _app = App.Launch(ExampleApp.Path, _recording.Options(RecordingMode.Failed));
+        _app = App.Launch(ExampleApp.Path, _recording.Options());
 
-        Assert.That(Path.GetFileName(_recording.Videos().Single()), Does.Contain(nameof(The_video_is_named_after_the_test_and_a_passing_test_leaves_none)));
+        Assert.That(Path.GetFileName(_recording.Videos().Single()), Does.Contain(nameof(The_video_is_named_after_the_test_and_a_passing_test_leaves_no_failed_video)));
     }
 
     [Test]
-    public void Mode_all_keeps_a_video_with_content()
+    public void A_video_has_content()
     {
-        var app = App.Launch(ExampleApp.Path, _recording.Options(RecordingMode.All));
+        var app = App.Launch(ExampleApp.Path, _recording.Options());
         app.Dispose();
 
         Assert.That(new FileInfo(_recording.Videos().Single()).Length, Is.GreaterThan(0));

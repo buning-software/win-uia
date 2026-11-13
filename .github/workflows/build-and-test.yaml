@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       record-all-tests:
-        description: Keep a screen recording of every UI test, not only failed ones
+        description: Upload the screen recording of every UI test, not only failed ones
         type: boolean
         default: false
 
@@ -121,18 +121,16 @@ jobs:
           "WINUIA_FFMPEG=$ffmpeg" >> $env:GITHUB_ENV
 
       - name: UI test
-        env:
-          WINUIA_RECORDING: ${{ inputs.record-all-tests && 'all' || 'failed' }}
-          WINUIA_RECORDING_DIR: ${{ github.workspace }}/TestResults/Recordings
         run: >-
           dotnet test --no-build --configuration Release --logger GitHubActions
           --filter "FullyQualifiedName~.UiTests."
 
+      # Every run is recorded to .../Recordings/All and a failed test is copied to .../Recordings/Failed: pick what to upload.
       - name: Upload UI test recordings
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: ui-test-recordings
-          path: TestResults/Recordings
+          path: '**/TestResults/Recordings/${{ inputs.record-all-tests && 'All' || 'Failed' }}'
           if-no-files-found: ignore
           retention-days: 14

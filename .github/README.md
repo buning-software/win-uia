@@ -134,8 +134,8 @@ Console.WriteLine(app.Find("txtResult").GetText());
             ShowPointer = true,
             Recording = new RecordingOptions   // optional: records the screen while the app runs, see Recording below
             {
-                Name = () => TestContext.CurrentContext.Test.FullName,
-                Keep = () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive,
+                FileName = () => TestContext.CurrentContext.Test.FullName,
+                Failed = () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive,
             },
         };
     }
@@ -221,7 +221,7 @@ The rest is your framework's own: tag or group UI tests to filter them (a catego
 
 ### Recording
 
-With the optional `WinUia.Recording` package, put a `RecordingOptions` in the app's `DefaultOptions` (see [Setting up your application](#setting-up-your-application)), or in the `AppLaunchOptions` of one launch. `Keep` is asked when the app is disposed, so dispose it in `[TearDown]`; without `Name` and `Keep` every video is kept. Videos go to `TestResults/Recordings`, or to `WINUIA_RECORDING_DIR`. Set `WINUIA_RECORDING` to `all`, `failed` or `off` to change what is recorded without touching code.
+With the optional `WinUia.Recording` package, put a `RecordingOptions` in the app's `DefaultOptions` (see [Setting up your application](#setting-up-your-application)), or in the `AppLaunchOptions` of one launch. Every run is recorded, locally too, to `TestResults/Recordings/All`. `Failed` is asked when the app is disposed, so dispose it in `[TearDown]`: for a failed test the video is also copied to `TestResults/Recordings/Failed`. Set `AllDirectory` and `FailedDirectory` to put them elsewhere; the pipeline decides what to keep or upload.
 
 [ffmpeg](https://ffmpeg.org) is not bundled: put it on `PATH`, or point `WINUIA_FFMPEG` at `ffmpeg.exe`. Projects that don't use the package are unaffected. All options are in the [package README](../src/WinUia.Recording/README.md).
 
@@ -233,7 +233,7 @@ WinUia is a modular monolith: one project and up to three test projects per modu
 |---|---|---|---|
 | `WinUia` | Application | `App` (launch, attach, find, close), `AppLaunchOptions`, `AppProcessException`, `IAppRecorder` (the hook a recording plugs into); internal launchers | `WinUia.Core` (public API only) |
 | `WinUia.Core` | Automation | `AutomationContext`, `Element` (lambda searches, self-healing locators), `WinUia.Patterns`, the `Uia*Exception` types, physical input (`WinUia.Input`: `IInputSimulator` and `Win32InputSimulator` via `SendInput`; one per `AutomationContext` as `Input`, replaceable in tests), `Poll` and `DesktopLock`, the UIA COM and Win32 interop | — |
-| `WinUia.Recording` | Application (optional) | `RecordingOptions` (an `IAppRecorder`), `IRecorder` and `FfmpegRecorder`, `ScreenRecording`, `ScreenArea`, `RecordingMode` | `WinUia` (public API only) |
+| `WinUia.Recording` | Application (optional) | `RecordingOptions` (an `IAppRecorder`), `IRecorder` and `FfmpegRecorder`, `ScreenRecording`, `ScreenArea` | `WinUia` (public API only) |
 
 Module rules:
 

@@ -4,13 +4,14 @@ internal static class RecordingFile
 {
     private const int MaxNameLength = 100;
 
-    public const string DirectoryEnvironmentVariable = "WINUIA_RECORDING_DIR";
+    private static readonly string DefaultRoot = Path.Combine("TestResults", "Recordings");
 
-    // Directory: option, then WINUIA_RECORDING_DIR, then TestResults/Recordings.
-    public static string ResolveFolder(string? directory, string? fromEnvironment) =>
-        !string.IsNullOrWhiteSpace(directory) ? directory
-        : !string.IsNullOrEmpty(fromEnvironment) ? fromEnvironment
-        : Path.Combine("TestResults", "Recordings");
+    // The one place that picks an option over its default, for both directories.
+    public static (string All, string Failed) ResolveDirectories(string? allDirectory, string? failedDirectory) =>
+        (Resolve(allDirectory, "All"), Resolve(failedDirectory, "Failed"));
+
+    private static string Resolve(string? option, string defaultName) =>
+        !string.IsNullOrWhiteSpace(option) ? option : Path.Combine(DefaultRoot, defaultName);
 
     // Numbered so a second launch in the same test does not overwrite the first.
     public static string Choose(string folder, string? name, string extension, Func<string, bool>? exists = null)
