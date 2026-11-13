@@ -17,9 +17,8 @@ public sealed class WinFormsApp : App
         DesktopTimeout = TimeSpan.FromMinutes(60),
         Recording = new RecordingOptions
         {
-            Name = () => TestContext.CurrentContext.Test.FullName,
-            Keep = () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive,
-            OnKept = path => TestContext.AddTestAttachment(path),
+            FileName = () => TestContext.CurrentContext.Test.FullName,
+            Failed = () => TestContext.CurrentContext.Result.Outcome.Status is TestStatus.Failed or TestStatus.Inconclusive,
         },
     };
 }

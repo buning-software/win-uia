@@ -1,21 +1,11 @@
 namespace WinUia.Recording;
 
-internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode, Func<bool>? keepVideo, Action<string>? onKept = null) : IDisposable
+internal sealed class AppRecording(ScreenRecording recording, Func<bool>? failed, string failedDirectory) : IDisposable
 {
     public void Dispose()
     {
-        // Keep the video when it cannot be decided, so a failure is never lost.
-        var keep = true;
-        try
-        {
-            keep = mode == RecordingMode.All || keepVideo?.Invoke() != false;
-        }
-        catch (Exception exception) when (exception is not OutOfMemoryException)
-        {
-            Console.Error.WriteLine($"WinUia.Recording: could not decide whether to keep the video, keeping it: {exception.Message}");
-        }
-
-        recording.Keep = keep;
+        // Every video stays in the all directory; the failure signal only routes a copy.
+        recording.Keep = true;
         try
         {
             recording.Dispose();
@@ -26,16 +16,32 @@ internal sealed class AppRecording(ScreenRecording recording, RecordingMode mode
             Console.Error.WriteLine($"WinUia.Recording: could not stop the recording {recording.OutputPath}: {exception.Message}");
         }
 
-        if (keep && onKept is not null && File.Exists(recording.OutputPath))
+        if (!File.Exists(recording.OutputPath) || !HasFailed())
+            return;
+
+        try
         {
-            try
-            {
-                onKept(recording.OutputPath);
-            }
-            catch (Exception exception) when (exception is not OutOfMemoryException)
-            {
-                Console.Error.WriteLine($"WinUia.Recording: OnKept failed for {recording.OutputPath}: {exception.Message}");
-            }
+            var path = RecordingFile.Choose(failedDirectory, Path.GetFileNameWithoutExtension(recording.OutputPath), Path.GetExtension(recording.OutputPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+            File.Copy(recording.OutputPath, path);
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            Console.Error.WriteLine($"WinUia.Recording: could not copy {recording.OutputPath} to {failedDirectory}: {exception.Message}");
+        }
+    }
+
+    // When it cannot be decided, treat the test as failed, so a failure is never lost.
+    private bool HasFailed()
+    {
+        try
+        {
+            return failed?.Invoke() == true;
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            Console.Error.WriteLine($"WinUia.Recording: could not decide whether the test failed, copying the video to the failed directory: {exception.Message}");
+            return true;
         }
     }
 }

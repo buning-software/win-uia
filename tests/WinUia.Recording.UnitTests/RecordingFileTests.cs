@@ -43,4 +43,22 @@ public class RecordingFileTests
 
         Assert.That(Path.GetFileName(path), Does.Match(@"^\d{8}-\d{6}\.mp4$"));
     }
+
+    [Test]
+    public void The_directories_default_to_All_and_Failed_under_TestResults_Recordings()
+    {
+        var (all, failed) = RecordingFile.ResolveDirectories(null, null);
+
+        Assert.That(all, Is.EqualTo(Path.Combine("TestResults", "Recordings", "All")));
+        Assert.That(failed, Is.EqualTo(Path.Combine("TestResults", "Recordings", "Failed")));
+    }
+
+    [Test]
+    public void An_option_overrides_its_own_directory_only()
+    {
+        var (all, failed) = RecordingFile.ResolveDirectories(@"C:\videos", "  ");
+
+        Assert.That(all, Is.EqualTo(@"C:\videos"));
+        Assert.That(failed, Is.EqualTo(Path.Combine("TestResults", "Recordings", "Failed")));
+    }
 }

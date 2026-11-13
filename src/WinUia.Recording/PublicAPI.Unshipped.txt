@@ -14,23 +14,17 @@ WinUia.Recording.IRecorder
 WinUia.Recording.IRecorder.FileExtension.get -> string!
 WinUia.Recording.IRecorder.Start(string! outputPath, WinUia.ScreenRect? area) -> System.IDisposable!
 WinUia.Recording.IRecorder.UnavailableReason.get -> string?
-WinUia.Recording.RecordingMode
-WinUia.Recording.RecordingMode.All = 1 -> WinUia.Recording.RecordingMode
-WinUia.Recording.RecordingMode.Failed = 0 -> WinUia.Recording.RecordingMode
-WinUia.Recording.RecordingMode.Off = 2 -> WinUia.Recording.RecordingMode
 WinUia.Recording.RecordingOptions
 WinUia.Recording.RecordingOptions.Area.get -> WinUia.ScreenRect?
 WinUia.Recording.RecordingOptions.Area.init -> void
-WinUia.Recording.RecordingOptions.Keep.get -> System.Func<bool>?
-WinUia.Recording.RecordingOptions.Keep.init -> void
-WinUia.Recording.RecordingOptions.OnKept.get -> System.Action<string!>?
-WinUia.Recording.RecordingOptions.OnKept.init -> void
-WinUia.Recording.RecordingOptions.Name.get -> System.Func<string?>?
-WinUia.Recording.RecordingOptions.Name.init -> void
-WinUia.Recording.RecordingOptions.Mode.get -> WinUia.Recording.RecordingMode
-WinUia.Recording.RecordingOptions.Mode.init -> void
-WinUia.Recording.RecordingOptions.OutputDirectory.get -> string?
-WinUia.Recording.RecordingOptions.OutputDirectory.init -> void
+WinUia.Recording.RecordingOptions.FileName.get -> System.Func<string?>?
+WinUia.Recording.RecordingOptions.FileName.init -> void
+WinUia.Recording.RecordingOptions.AllDirectory.get -> string?
+WinUia.Recording.RecordingOptions.AllDirectory.init -> void
+WinUia.Recording.RecordingOptions.Failed.get -> System.Func<bool>?
+WinUia.Recording.RecordingOptions.Failed.init -> void
+WinUia.Recording.RecordingOptions.FailedDirectory.get -> string?
+WinUia.Recording.RecordingOptions.FailedDirectory.init -> void
 WinUia.Recording.RecordingOptions.Recorder.get -> WinUia.Recording.IRecorder!
 WinUia.Recording.RecordingOptions.Recorder.init -> void
 WinUia.Recording.RecordingOptions.RecordingOptions() -> void

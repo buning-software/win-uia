@@ -4,21 +4,12 @@ using WinUia.Models;
 namespace WinUia.Recording;
 
 /// <summary>
-/// The recording flow behind <see cref="RecordingOptions"/>: decides whether to record, where the video goes and which
-/// videos are kept. The environment is read through <c>getEnvironmentVariable</c>, so the flow can be tested without it.
+/// The recording flow behind <see cref="RecordingOptions"/>: starts the recording and says where the video goes.
 /// </summary>
-internal sealed class ScreenRecorder(RecordingOptions options, Func<string, string?> getEnvironmentVariable) : IAppRecorder
+internal sealed class ScreenRecorder(RecordingOptions options) : IAppRecorder
 {
     public IDisposable Start(AppRecordingContext context)
     {
-        var environmentMode = getEnvironmentVariable(RecordingModes.EnvironmentVariable);
-        if (!string.IsNullOrWhiteSpace(environmentMode) && RecordingModes.Parse(environmentMode) is null)
-            Warn($"ignoring {RecordingModes.EnvironmentVariable}='{environmentMode}'; use failed, all or off.");
-
-        var mode = RecordingModes.Resolve(options.Mode, environmentMode);
-        if (mode == RecordingMode.Off)
-            return Nothing.Instance;
-
         var recorder = options.Recorder;
 
         try
@@ -31,10 +22,10 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
             }
 
             var name = ChooseName(context);
-            var folder = RecordingFile.ResolveFolder(options.OutputDirectory, getEnvironmentVariable(RecordingFile.DirectoryEnvironmentVariable));
-            var path = RecordingFile.Choose(folder, name, recorder.FileExtension);
+            var (allDirectory, failedDirectory) = RecordingFile.ResolveDirectories(options.AllDirectory, options.FailedDirectory);
+            var path = RecordingFile.Choose(allDirectory, name, recorder.FileExtension);
             var recording = ScreenRecording.Start(path, recorder, options.Area ?? ScreenArea.PrimaryMonitor());
-            return new AppRecording(recording, mode, options.Keep, options.OnKept);
+            return new AppRecording(recording, options.Failed, failedDirectory);
         }
         catch (Exception exception) when (exception is not OutOfMemoryException)
         {
@@ -49,7 +40,7 @@ internal sealed class ScreenRecorder(RecordingOptions options, Func<string, stri
     {
         try
         {
-            if (options.Name?.Invoke() is { Length: > 0 } name)
+            if (options.FileName?.Invoke() is { Length: > 0 } name)
                 return name;
         }
         catch (Exception exception) when (exception is not OutOfMemoryException)
