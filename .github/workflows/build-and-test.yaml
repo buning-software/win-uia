@@ -126,11 +126,22 @@ jobs:
           --filter "FullyQualifiedName~.UiTests."
 
       # Every run is recorded to .../Recordings/All and a failed test is copied to .../Recordings/Failed: pick what to upload.
-      - name: Upload UI test recordings
+      - name: Collect recordings
+        if: always()
+        shell: pwsh
+        env:
+          KIND: ${{ inputs.record-all-tests && 'All' || 'Failed' }}
+        run: |
+          New-Item -ItemType Directory -Force recordings | Out-Null
+          Get-ChildItem tests, examples -Recurse -Directory -Filter $env:KIND -ErrorAction SilentlyContinue |
+            Where-Object { $_.Parent.Name -eq 'Recordings' } |
+            ForEach-Object { Copy-Item (Join-Path $_.FullName '*') recordings -Force }
+
+      - name: Upload recordings
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: ui-test-recordings
-          path: "**/TestResults/Recordings/${{ inputs.record-all-tests && 'All' || 'Failed' }}"
+          path: recordings
           if-no-files-found: ignore
           retention-days: 14

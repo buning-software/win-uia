@@ -22,7 +22,7 @@ public sealed class DialogTests : WinFormsFixture
     }
 
     [Test]
-    public void TryFindWindow_returns_null_for_a_window_that_does_not_exist()
+    public void TryFindWindow_returns_null_for_a_missing_window()
     {
         Assert.That(WinFormsApp.TryFindWindow("No such window", TimeSpan.FromMilliseconds(100)), Is.Null);
     }
