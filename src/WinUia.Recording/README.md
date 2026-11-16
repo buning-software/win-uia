@@ -49,7 +49,7 @@ Recording = new RecordingOptions
 
 `Failed` is asked when the app is disposed, so dispose the app in `[TearDown]`. When it says the test failed, the video is
 also copied to `TestResults/Recordings/Failed`; a passing test leaves its video in `All` only. `Failed` never deletes a video.
-When a name is longer than 100 characters its end is kept.
+When a name would make the path longer than Windows' 260 characters, which ffmpeg may not write, the start of the name is cut so the video is still recorded; the end of the name, which tells tests apart, is kept.
 
 The default directories are relative to the current directory, which for `dotnet test --results-directory <dir>` is not `<dir>`:
 set `AllDirectory` and `FailedDirectory` when the pipeline looks elsewhere.

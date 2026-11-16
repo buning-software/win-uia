@@ -27,6 +27,41 @@ public class RecordingFileTests
     }
 
     [Test]
+    public void A_name_too_long_for_the_folder_is_shortened_so_the_path_fits_and_keeps_its_end()
+    {
+        var folder = @"C:\" + new string('d', 150);
+        var name = "WinUia.Examples." + new string('x', 200) + ".The_end";
+
+        var path = RecordingFile.Choose(folder, name, ".mp4", _ => false);
+
+        Assert.That(path.Length, Is.LessThanOrEqualTo(259 - 4));
+        Assert.That(Path.GetFileName(path), Is.EqualTo("The_end.mp4"));
+    }
+
+    [Test]
+    public void A_numbered_recording_in_a_long_folder_still_fits()
+    {
+        var folder = @"C:\" + new string('d', 150);
+        var name = new string('x', 300);
+        var taken = new HashSet<string>();
+        var first = RecordingFile.Choose(folder, name, ".mp4", _ => false);
+        taken.Add(first);
+
+        var second = RecordingFile.Choose(folder, name, ".mp4", taken.Contains);
+
+        Assert.That(second, Is.Not.EqualTo(first));
+        Assert.That(second.Length, Is.LessThanOrEqualTo(259));
+    }
+
+    [Test]
+    public void A_name_that_fits_is_left_alone()
+    {
+        var path = RecordingFile.Choose(@"C:\out", "WinUia.Tests.MyTest.Does_it", ".mp4", _ => false);
+
+        Assert.That(Path.GetFileName(path), Is.EqualTo("WinUia.Tests.MyTest.Does_it.mp4"));
+    }
+
+    [Test]
     public void A_second_recording_with_the_same_name_gets_a_number_instead_of_overwriting()
     {
         var taken = new HashSet<string> { @"C:\out\MyTest.mp4", @"C:\out\MyTest-2.mp4" };

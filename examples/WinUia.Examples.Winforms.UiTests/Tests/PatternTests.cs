@@ -85,7 +85,7 @@ public sealed partial class PatternTests : WinFormsFixture
     }
 
     [Test]
-    public void FromPoint_and_GetFocusedElement_return_the_expected_elements()
+    public void FromPoint_and_GetFocusedElement_find_the_elements()
     {
         var input = MainForm.InputBox;
         input.Focus();
@@ -107,7 +107,7 @@ public sealed partial class PatternTests : WinFormsFixture
     }
 
     [Test]
-    public void AddToSelection_and_RemoveFromSelection_change_a_multi_select_list()
+    public void AddToSelection_and_RemoveFromSelection_change_a_list()
     {
         var list = MainForm.ItemsList;
         var alpha = list.Find(e => e.Name == "Alpha");
@@ -152,7 +152,7 @@ public sealed partial class PatternTests : WinFormsFixture
     }
 
     [Test]
-    public void With_ShowPointer_the_cursor_moves_to_each_element_before_the_interaction()
+    public void With_ShowPointer_the_cursor_moves_to_each_element()
     {
         WinFormsApp.Context.ShowPointer = true;
         WinFormsApp.Context.Input.MoveTo(5, 5);
@@ -173,7 +173,7 @@ public sealed partial class PatternTests : WinFormsFixture
     }
 
     [Test]
-    public void Without_ShowPointer_interactions_do_not_move_the_cursor_to_the_elements()
+    public void Without_ShowPointer_the_cursor_does_not_move()
     {
         WinFormsApp.Context.ShowPointer = false;
         WinFormsApp.Context.Input.MoveTo(5, 5);

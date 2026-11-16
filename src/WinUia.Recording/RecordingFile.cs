@@ -2,7 +2,14 @@ namespace WinUia.Recording;
 
 internal static class RecordingFile
 {
-    private const int MaxNameLength = 100;
+    // MAX_PATH is 260 including the terminating null. Not every tool (ffmpeg, Explorer) handles longer paths, and a video
+    // that cannot be written is a missing video, so the name is made to fit the folder instead.
+    private const int MaxPathLength = 259;
+
+    // Room for the "-2" ... "-999" that keeps a second recording from overwriting the first.
+    private const int NumberReserve = 4;
+
+    private const int MinNameLength = 16;
 
     private static readonly string DefaultRoot = Path.Combine("TestResults", "Recordings");
 
@@ -18,7 +25,8 @@ internal static class RecordingFile
     {
         exists ??= File.Exists;
 
-        var baseName = Sanitize(string.IsNullOrWhiteSpace(name) ? DateTime.Now.ToString("yyyyMMdd-HHmmss") : name);
+        var budget = MaxPathLength - Path.GetFullPath(folder).TrimEnd(Path.DirectorySeparatorChar).Length - 1 - extension.Length - NumberReserve;
+        var baseName = Fit(Sanitize(string.IsNullOrWhiteSpace(name) ? DateTime.Now.ToString("yyyyMMdd-HHmmss") : name), Math.Max(budget, MinNameLength));
         var path = Path.Combine(folder, baseName + extension);
         for (var number = 2; exists(path); number++)
             path = Path.Combine(folder, $"{baseName}-{number}{extension}");
@@ -29,10 +37,18 @@ internal static class RecordingFile
     public static string Sanitize(string name)
     {
         var invalid = Path.GetInvalidFileNameChars();
-        var clean = string.Concat(name.Select(c => invalid.Contains(c) ? '_' : c));
+        return string.Concat(name.Select(c => invalid.Contains(c) ? '_' : c));
+    }
 
-        // Parameterised test names can be very long, and the whole path must stay under MAX_PATH.
-        // Keep the tail: the test name and its parameters come last and tell recordings apart.
-        return clean.Length > MaxNameLength ? clean[^MaxNameLength..] : clean;
+    // Keep the tail: the test name and its parameters come last and tell recordings apart.
+    // Start at a segment boundary, so the name begins with a whole namespace or class name, not half of one.
+    private static string Fit(string name, int maxLength)
+    {
+        if (name.Length <= maxLength)
+            return name;
+
+        var tail = name[^maxLength..];
+        var boundary = tail.IndexOf('.');
+        return boundary >= 0 && boundary < tail.Length - 1 ? tail[(boundary + 1)..] : tail;
     }
 }

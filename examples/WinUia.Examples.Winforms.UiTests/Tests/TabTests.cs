@@ -49,7 +49,7 @@ public sealed class TabTests : WinFormsFixture
     }
 
     [Test]
-    public void The_main_form_controls_keep_working_while_another_tab_is_selected()
+    public void The_main_form_controls_work_while_another_tab_is_selected()
     {
         var tab2 = MainForm.SelectTab2();
         MainForm.Button.Click();
